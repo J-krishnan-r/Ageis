@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "entities": [
+    {"id":"HPU","type":"assembly","preferred_name":"Hydraulic Power Unit","aliases":["HPU","Hydraulic Power Unit","Hydraulic Unit","HP unit","Hydraulic Power Pack","Hydraulic Power Pack","HP Pack"],"identity_basis":["operator manual §1 and §2","component register row 2","training slides 1–3"]},
+    {"id":"IV-21","type":"valve","preferred_name":"Isolation Valve 21","aliases":["IV-21","IV21","Isolation Valve 21","Isolation Valve","IV-21 Solenoid"],"identity_basis":["component register row 3","operator manual §2"]},
+    {"id":"PS-04","type":"pressure_sensor","preferred_name":"Pressure Sensor 04","aliases":["PS-04","PS04","P04","PRESSURE SENSOR 04"],"identity_basis":["component register row 4"],"relations":[{"type":"superseded_by","target":"PS-04A","condition":"firmware revision < 3.2"}]},
+    {"id":"PS-04A","type":"pressure_sensor","preferred_name":"Pressure Sensor 04A","aliases":["PS-04A","PS04A","P04A","P.S.04-A","P.S.04-A"],"identity_basis":["component register row 5","ECN-1042 p. 1","diagnostics screenshot region Sensor Diagnostics"],"relations":[{"type":"supersedes","target":"PS-04","condition":"firmware revision >= 3.2"}]},
+    {"id":"PS-40","type":"pressure_sensor","preferred_name":"Pressure Sensor 40","aliases":["PS-40","PS40","P40"],"identity_basis":["component register row 6","configuration_export.json $.sensors.sensor_ps40_zone"],"relations":[{"type":"located_in","target":"Coolant Loop, Skid B"}]},
+    {"id":"PLC-03","type":"controller","preferred_name":"HCS Controller","aliases":["PLC-03","Controller","Aegis Controller","HCS Controller"],"identity_basis":["operator manual §1–2","component register row 7"]},
+    {"id":"A17","type":"alarm","preferred_name":"Hydraulic Pressure Low","aliases":["A17","Alarm A17","Hydraulic Pressure Low"],"identity_basis":["alarm reference AEG-AL-700 Rev 5 row A17"]},
+    {"id":"A18","type":"alarm","preferred_name":"Hydraulic Pressure High","aliases":["A18","Alarm A18","Hydraulic Pressure High"],"identity_basis":["alarm reference AEG-AL-700 Rev 5 row A18"]},
+    {"id":"A19","type":"alarm","preferred_name":"Pressure Sensor Signal Invalid","aliases":["A19","Alarm A19","Pressure Sensor Signal Invalid"],"identity_basis":["alarm reference AEG-AL-700 Rev 5 row A19"]},
+    {"id":"TB-7","type":"terminal_block","preferred_name":"Terminal Block 7","aliases":["TB-7","TB7"],"identity_basis":["component register row 11","wiring diagram AEG-DWG-W03"]},
+    {"id":"Q1","type":"disconnect","preferred_name":"Main Disconnect","aliases":["Q1","Main Disconnect"],"identity_basis":["component register row 12","electrical diagram AEG-DWG-E02"]},
+    {"id":"T1","type":"transformer","preferred_name":"Control Transformer","aliases":["T1","Control Transformer"],"identity_basis":["component register row 13","electrical diagram AEG-DWG-E02"]},
+    {"id":"Auxiliary Reservoir","type":"reservoir","preferred_name":"Auxiliary Reservoir","aliases":["Auxiliary Reservoir"],"identity_basis":["training slide excerpt, slide 2"],"scope":"Line 4/5 configurations per training slide only"},
+    {"id":"Coolant Loop, Skid B","type":"location","preferred_name":"Coolant Loop, Skid B","aliases":["Coolant Loop, Skid B"],"identity_basis":["component register row 6"]},
+    {"id":"Hydraulic Module","type":"location","preferred_name":"Hydraulic Module","aliases":["Hydraulic Module"],"identity_basis":["component register row 3"]}
+  ]
+}

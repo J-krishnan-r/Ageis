@@ -1,0 +1,29 @@
+{
+  "benchmark":"Aegis Knowledge Ingestion Challenge, evaluation-questions.pdf p. 1",
+  "answerable_count":18,
+  "cases":[
+    {"id":"Q01","question":"What must be true before starting the Hydraulic Power Unit?","expected_route":"startup_checks","expected_status":"answered","expected_facts":["f.startup.fluid","f.startup.valve","f.startup.estop","f.startup.panel"]},
+    {"id":"Q02","question":"What is the current normal operating pressure for the HPU, and under what conditions does that apply?","expected_route":"normal_pressure","expected_status":"answered","expected_facts":["f.pressure.current","f.pressure.legacy"]},
+    {"id":"Q03","question":"What does alarm A17 indicate, and what are its possible causes?","expected_route":"alarm_a17_definition","expected_status":"answered","expected_facts":["f.a17.low_condition","f.a17.causes"]},
+    {"id":"Q04","question":"Is PS-04 the same component as PS-04A?","expected_route":"sensor_ps04_vs_ps04a","expected_status":"answered","expected_facts":["f.sensor.ps04_superseded","f.sensor.not_form_fit"]},
+    {"id":"Q05","question":"Which document introduced the change from PS-04 to PS-04A?","expected_route":"ecn_1042_sensor_change","expected_status":"answered","expected_facts":["f.sensor.ps04_superseded","f.sensor.not_form_fit"]},
+    {"id":"Q06","question":"Which components connect directly to the HCS controller, according to the hydraulic schematic?","expected_route":"diagram_controller_connections","expected_status":"answered","expected_facts":["f.diagram.control_edges","f.diagram.ambiguous_grey"]},
+    {"id":"Q07","question":"What action is required if alarm A17 persists for more than 10 seconds?","expected_route":"alarm_a17_persistent_action","expected_status":"answered","expected_facts":["f.a17.response"]},
+    {"id":"Q08","question":"Under what circumstances must the controller not be reset?","expected_route":"controller_reset","expected_status":"answered","expected_facts":["f.reset.limit"]},
+    {"id":"Q09","question":"What was the operating pressure threshold before software revision 3.2, and what changed it?","expected_route":"pressure_before_3_2","expected_status":"answered","expected_facts":["f.pressure.legacy","f.sensor.ps04_superseded","f.revision.3_2_date"]},
+    {"id":"Q10","question":"Which alarm is associated with a pressure sensor reading below 150 bar?","expected_route":"alarm_a17_threshold","expected_status":"answered","expected_facts":["f.a17.low_condition","f.a17.threshold_unchanged"]},
+    {"id":"Q11","question":"According to the component register, what is the location of the isolation valve IV-21?","expected_route":"valve_location","expected_status":"answered","expected_facts":["f.valve.location"]},
+    {"id":"Q12","question":"Does the training slide deck introduce any component or alarm not found in the manuals?","expected_route":"training_additions","expected_status":"answered","expected_facts":["f.training.aux_reservoir","f.training.no_new_alarms"]},
+    {"id":"Q13","question":"What sensor ID appears on the diagnostics screenshot, and does it match a known component?","expected_route":"diagnostics_tag","expected_status":"answered","expected_facts":["f.diagnostics.tag_variant"]},
+    {"id":"Q14","question":"Per the revision history, when did software revision 3.2 take effect, and what changed alongside it?","expected_route":"revision_3_2_history","expected_status":"answered","expected_facts":["f.revision.3_2_date","f.sensor.ps04_superseded","f.pressure.current"]},
+    {"id":"Q15","question":"What does sensor_ps04a_threshold_bar in the configuration export correspond to in the operator manual's terminology?","expected_route":"configuration_setpoint_mapping","expected_status":"answered","expected_facts":["f.configuration.pressure_key","f.a17.threshold_unchanged"]},
+    {"id":"Q16","question":"Does the 200 bar threshold apply to all Aegis HCS units, or only some?","expected_route":"setpoint_applies_scope","expected_status":"answered","expected_facts":["f.pressure.current","f.pressure.legacy","f.pressure.manufacture_scope"]},
+    {"id":"Q17","question":"Is PS-04 the same as PS-40?","expected_route":"sensor_ps04_vs_ps40","expected_status":"answered","expected_facts":["f.sensor.ps40_distinct"]},
+    {"id":"Q18","question":"What was the pressure limit before revision 3.2?","expected_route":"pressure_before_3_2","expected_status":"answered","expected_facts":["f.pressure.legacy","f.sensor.ps04_superseded","f.revision.3_2_date"]},
+    {"id":"Q19","question":"What is the maximum continuous operating temperature of PS-04A?","expected_route":"sensor_temperature","expected_status":"abstained","expected_facts":["f.document.absence.temp"]},
+    {"id":"Q20","question":"What is the calibration interval for the electrical system diagram's voltage sensor?","expected_route":"voltage_calibration_interval","expected_status":"abstained","expected_facts":["f.document.absence.voltage_sensor","f.electrical.supply"]},
+    {"id":"Q21","question":"Who approved engineering bulletin ECN-1058?","expected_route":"ecn_approver","expected_status":"abstained","expected_facts":["f.document.absence.ecn_approval"]},
+    {"id":"Q22","question":"What is the mean time between failures for the isolation valve IV-21?","expected_route":"valve_mtbf","expected_status":"abstained","expected_facts":["f.document.absence.mtbf"]},
+    {"id":"Q23","question":"Is the Aegis Series-7 HCS compatible with a 3-phase 400V supply?","expected_route":"power_compatibility","expected_status":"abstained","expected_facts":["f.document.absence.400v"]}
+  ]
+}

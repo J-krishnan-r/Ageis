@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aegis-evidence-system"
+version = "1.0.0"
+description = "A provenance-preserving knowledge system for the Aegis Series-7 HCS assessment"
+requires-python = ">=3.10"
+dependencies = [
+  "pypdf>=5.0,<7",
+  "python-docx>=1.1,<2",
+  "openpyxl>=3.1,<4",
+  "python-pptx>=1.0,<2",
+  "Pillow>=10,<13",
+]
+
+[project.scripts]
+aegis = "aegis.__main__:main"
+
+[tool.setuptools]
+packages = ["aegis"]
+
+[tool.setuptools.package-data]
+aegis = ["knowledge/*.json", "benchmarks/*.json"]

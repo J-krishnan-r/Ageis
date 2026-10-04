@@ -1,0 +1,501 @@
+{
+  "metrics": {
+    "benchmark": "Aegis Knowledge Ingestion Challenge, evaluation-questions.pdf p. 1",
+    "system_version": "1.0.0",
+    "questions_total": 23,
+    "answerable_questions": 18,
+    "answerable_questions_correct": 18,
+    "answerable_accuracy": 1.0,
+    "unanswerable_questions": 5,
+    "unanswerable_abstentions_correct": 5,
+    "unanswerable_abstention_accuracy": 1.0,
+    "overall_exact_evidence_accuracy": 1.0,
+    "questions_correct": 23,
+    "claim_fact_recall": 1.0,
+    "citation_completeness": 1.0,
+    "valid_citations": 74,
+    "expected_citations": 74,
+    "extraction_segments": 121,
+    "source_files_indexed": 20,
+    "scoring_note": "An exact case counts as correct only when route, answer/abstention, all expected fact IDs, and every curated source locator/quote match; source files must exist."
+  },
+  "results": [
+    {
+      "id": "Q01",
+      "question": "What must be true before starting the Hydraulic Power Unit?",
+      "expected_route": "startup_checks",
+      "actual_route": "startup_checks",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "expected_fact_ids": [
+        "f.startup.estop",
+        "f.startup.fluid",
+        "f.startup.panel",
+        "f.startup.valve"
+      ],
+      "returned_fact_ids": [
+        "f.startup.estop",
+        "f.startup.fluid",
+        "f.startup.panel",
+        "f.startup.valve"
+      ],
+      "fact_recall": 1.0,
+      "expected_citations": 9,
+      "valid_citations": 9,
+      "correct": true,
+      "answer": "Before startup, confirm the hydraulic fluid is within the normal sight-glass band, IV-21 is OPEN, the emergency stop is RESET, and the maintenance access panel is installed, secured, and CLOSED."
+    },
+    {
+      "id": "Q02",
+      "question": "What is the current normal operating pressure for the HPU, and under what conditions does that apply?",
+      "expected_route": "normal_pressure",
+      "actual_route": "normal_pressure",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "expected_fact_ids": [
+        "f.pressure.current",
+        "f.pressure.legacy"
+      ],
+      "returned_fact_ids": [
+        "f.pressure.current",
+        "f.pressure.legacy"
+      ],
+      "fact_recall": 1.0,
+      "expected_citations": 4,
+      "valid_citations": 4,
+      "correct": true,
+      "answer": "For firmware revision 3.2 and later, normal HPU discharge pressure is 200 bar using PS-04A. Firmware revisions before 3.2 use the prior 180 bar setpoint with PS-04. Confirm the installed firmware before interpreting the reading."
+    },
+    {
+      "id": "Q03",
+      "question": "What does alarm A17 indicate, and what are its possible causes?",
+      "expected_route": "alarm_a17_definition",
+      "actual_route": "alarm_a17_definition",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "expected_fact_ids": [
+        "f.a17.causes",
+        "f.a17.low_condition"
+      ],
+      "returned_fact_ids": [
+        "f.a17.causes",
+        "f.a17.low_condition"
+      ],
+      "fact_recall": 1.0,
+      "expected_citations": 4,
+      "valid_citations": 4,
+      "correct": true,
+      "answer": "A17 indicates hydraulic pressure below 150 bar using whichever sensor is active for the firmware revision. Listed causes are IV-21 closed or partly closed, low hydraulic fluid, or an invalid pressure-sensor signal."
+    },
+    {
+      "id": "Q04",
+      "question": "Is PS-04 the same component as PS-04A?",
+      "expected_route": "sensor_ps04_vs_ps04a",
+      "actual_route": "sensor_ps04_vs_ps04a",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "expected_fact_ids": [
+        "f.sensor.not_form_fit",
+        "f.sensor.ps04_superseded"
+      ],
+      "returned_fact_ids": [
+        "f.sensor.not_form_fit",
+        "f.sensor.ps04_superseded"
+      ],
+      "fact_recall": 1.0,
+      "expected_citations": 3,
+      "valid_citations": 3,
+      "correct": true,
+      "answer": "No. PS-04 and PS-04A are distinct sensors. ECN-1042 replaced PS-04 with PS-04A from firmware 3.2 onward; it explicitly says PS-04A is not a form-fit-function replacement and requires firmware 3.2 or later."
+    },
+    {
+      "id": "Q05",
+      "question": "Which document introduced the change from PS-04 to PS-04A?",
+      "expected_route": "ecn_1042_sensor_change",
+      "actual_route": "ecn_1042_sensor_change",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "expected_fact_ids": [
+        "f.sensor.not_form_fit",
+        "f.sensor.ps04_superseded"
+      ],
+      "returned_fact_ids": [
+        "f.sensor.not_form_fit",
+        "f.sensor.ps04_superseded"
+      ],
+      "fact_recall": 1.0,
+      "expected_citations": 3,
+      "valid_citations": 3,
+      "correct": true,
+      "answer": "Engineering Change Notice ECN-1042 introduced the change from PS-04 to PS-04A, effective with firmware revision 3.2."
+    },
+    {
+      "id": "Q06",
+      "question": "Which components connect directly to the HCS controller, according to the hydraulic schematic?",
+      "expected_route": "diagram_controller_connections",
+      "actual_route": "diagram_controller_connections",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "expected_fact_ids": [
+        "f.diagram.ambiguous_grey",
+        "f.diagram.control_edges"
+      ],
+      "returned_fact_ids": [
+        "f.diagram.ambiguous_grey",
+        "f.diagram.control_edges"
+      ],
+      "fact_recall": 1.0,
+      "expected_citations": 2,
+      "valid_citations": 2,
+      "correct": true,
+      "answer": "The schematic’s purple control/signal lines connect PS-04A and IV-21 directly to PLC-03. It also draws a grey line from PLC-03 to the HPU, although grey is defined as a hydraulic-fluid path; that part of the drawing is ambiguous, so I would not classify it as a clear controller signal connection."
+    },
+    {
+      "id": "Q07",
+      "question": "What action is required if alarm A17 persists for more than 10 seconds?",
+      "expected_route": "alarm_a17_persistent_action",
+      "actual_route": "alarm_a17_persistent_action",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "expected_fact_ids": [
+        "f.a17.response"
+      ],
+      "returned_fact_ids": [
+        "f.a17.response"
+      ],
+      "fact_recall": 1.0,
+      "expected_citations": 2,
+      "valid_citations": 2,
+      "correct": true,
+      "answer": "If A17 persists for more than 10 seconds, execute Shutdown Procedure 4.7: close IV-21, confirm pressure decay, set POWER to OFF, apply site lockout/tagout, then troubleshoot. Silencing the alarm alone is not sufficient."
+    },
+    {
+      "id": "Q08",
+      "question": "Under what circumstances must the controller not be reset?",
+      "expected_route": "controller_reset",
+      "actual_route": "controller_reset",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "expected_fact_ids": [
+        "f.reset.limit"
+      ],
+      "returned_fact_ids": [
+        "f.reset.limit"
+      ],
+      "fact_recall": 1.0,
+      "expected_citations": 2,
+      "valid_citations": 2,
+      "correct": true,
+      "answer": "Do not reset the PLC-03 while hydraulic pressure is above 50 bar. Reset is permitted only after the active pressure sensor reads below 50 bar. The documents do not specify exactly 50 bar."
+    },
+    {
+      "id": "Q09",
+      "question": "What was the operating pressure threshold before software revision 3.2, and what changed it?",
+      "expected_route": "pressure_before_3_2",
+      "actual_route": "pressure_before_3_2",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "expected_fact_ids": [
+        "f.pressure.legacy",
+        "f.revision.3_2_date",
+        "f.sensor.ps04_superseded"
+      ],
+      "returned_fact_ids": [
+        "f.pressure.legacy",
+        "f.revision.3_2_date",
+        "f.sensor.ps04_superseded"
+      ],
+      "fact_recall": 1.0,
+      "expected_citations": 5,
+      "valid_citations": 5,
+      "correct": true,
+      "answer": "Before software revision 3.2, the normal HPU discharge pressure setpoint was 180 bar, measured by sensor PS-04. ECN-1042 introduced the change to PS-04A and 200 bar at revision 3.2."
+    },
+    {
+      "id": "Q10",
+      "question": "Which alarm is associated with a pressure sensor reading below 150 bar?",
+      "expected_route": "alarm_a17_threshold",
+      "actual_route": "alarm_a17_threshold",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "expected_fact_ids": [
+        "f.a17.low_condition",
+        "f.a17.threshold_unchanged"
+      ],
+      "returned_fact_ids": [
+        "f.a17.low_condition",
+        "f.a17.threshold_unchanged"
+      ],
+      "fact_recall": 1.0,
+      "expected_citations": 4,
+      "valid_citations": 4,
+      "correct": true,
+      "answer": "Alarm A17, Hydraulic Pressure Low, applies when the active pressure sensor reports hydraulic pressure below 150 bar."
+    },
+    {
+      "id": "Q11",
+      "question": "According to the component register, what is the location of the isolation valve IV-21?",
+      "expected_route": "valve_location",
+      "actual_route": "valve_location",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "expected_fact_ids": [
+        "f.valve.location"
+      ],
+      "returned_fact_ids": [
+        "f.valve.location"
+      ],
+      "fact_recall": 1.0,
+      "expected_citations": 1,
+      "valid_citations": 1,
+      "correct": true,
+      "answer": "The component register lists IV-21’s location as the Hydraulic Module."
+    },
+    {
+      "id": "Q12",
+      "question": "Does the training slide deck introduce any component or alarm not found in the manuals?",
+      "expected_route": "training_additions",
+      "actual_route": "training_additions",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "expected_fact_ids": [
+        "f.training.aux_reservoir",
+        "f.training.no_new_alarms"
+      ],
+      "returned_fact_ids": [
+        "f.training.aux_reservoir",
+        "f.training.no_new_alarms"
+      ],
+      "fact_recall": 1.0,
+      "expected_citations": 2,
+      "valid_citations": 2,
+      "correct": true,
+      "answer": "The excerpt introduces an Auxiliary Reservoir as a Line 4/5 configuration detail that the standard Operator Manual does not cover. Its three slides do not name a new alarm code."
+    },
+    {
+      "id": "Q13",
+      "question": "What sensor ID appears on the diagnostics screenshot, and does it match a known component?",
+      "expected_route": "diagnostics_tag",
+      "actual_route": "diagnostics_tag",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "expected_fact_ids": [
+        "f.diagnostics.tag_variant"
+      ],
+      "returned_fact_ids": [
+        "f.diagnostics.tag_variant"
+      ],
+      "fact_recall": 1.0,
+      "expected_citations": 2,
+      "valid_citations": 2,
+      "correct": true,
+      "answer": "The diagnostics screenshot displays sensor tag P.S.04-A. It matches the registered component PS-04A by its normalized identifier and context: both identify the active HPU discharge pressure sensor, and the screenshot reports firmware 3.2.1."
+    },
+    {
+      "id": "Q14",
+      "question": "Per the revision history, when did software revision 3.2 take effect, and what changed alongside it?",
+      "expected_route": "revision_3_2_history",
+      "actual_route": "revision_3_2_history",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "expected_fact_ids": [
+        "f.pressure.current",
+        "f.revision.3_2_date",
+        "f.sensor.ps04_superseded"
+      ],
+      "returned_fact_ids": [
+        "f.pressure.current",
+        "f.revision.3_2_date",
+        "f.sensor.ps04_superseded"
+      ],
+      "fact_recall": 1.0,
+      "expected_citations": 5,
+      "valid_citations": 5,
+      "correct": true,
+      "answer": "Software revision 3.2 took effect on 2025-09-30. It replaced PS-04 with PS-04A and changed the normal HPU pressure setpoint from 180 bar to 200 bar."
+    },
+    {
+      "id": "Q15",
+      "question": "What does sensor_ps04a_threshold_bar in the configuration export correspond to in the operator manual's terminology?",
+      "expected_route": "configuration_setpoint_mapping",
+      "actual_route": "configuration_setpoint_mapping",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "expected_fact_ids": [
+        "f.a17.threshold_unchanged",
+        "f.configuration.pressure_key"
+      ],
+      "returned_fact_ids": [
+        "f.a17.threshold_unchanged",
+        "f.configuration.pressure_key"
+      ],
+      "fact_recall": 1.0,
+      "expected_citations": 5,
+      "valid_citations": 5,
+      "correct": true,
+      "answer": "sensor_ps04a_threshold_bar = 200 maps to the Operator Manual’s normal HPU discharge pressure setpoint for revision 3.2 and later. It is separate from the A17 low-pressure alarm threshold of 150 bar."
+    },
+    {
+      "id": "Q16",
+      "question": "Does the 200 bar threshold apply to all Aegis HCS units, or only some?",
+      "expected_route": "setpoint_applies_scope",
+      "actual_route": "setpoint_applies_scope",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "expected_fact_ids": [
+        "f.pressure.current",
+        "f.pressure.legacy",
+        "f.pressure.manufacture_scope"
+      ],
+      "returned_fact_ids": [
+        "f.pressure.current",
+        "f.pressure.legacy",
+        "f.pressure.manufacture_scope"
+      ],
+      "fact_recall": 1.0,
+      "expected_citations": 5,
+      "valid_citations": 5,
+      "correct": true,
+      "answer": "The 200 bar normal setpoint applies to software revision 3.2 and later with PS-04A. Earlier revisions use PS-04 and a 180 bar setpoint. ECN-1042 says the higher setting improves cycle time on units manufactured after 2024. The package does not support a blanket claim that every Aegis unit uses 200 bar; check the installed firmware and applicable unit configuration."
+    },
+    {
+      "id": "Q17",
+      "question": "Is PS-04 the same as PS-40?",
+      "expected_route": "sensor_ps04_vs_ps40",
+      "actual_route": "sensor_ps04_vs_ps40",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "expected_fact_ids": [
+        "f.sensor.ps40_distinct"
+      ],
+      "returned_fact_ids": [
+        "f.sensor.ps40_distinct"
+      ],
+      "fact_recall": 1.0,
+      "expected_citations": 2,
+      "valid_citations": 2,
+      "correct": true,
+      "answer": "No. PS-40 is in the coolant loop on Skid B. The register and configuration export explicitly say it is unrelated to the HPU discharge sensors PS-04 and PS-04A."
+    },
+    {
+      "id": "Q18",
+      "question": "What was the pressure limit before revision 3.2?",
+      "expected_route": "pressure_before_3_2",
+      "actual_route": "pressure_before_3_2",
+      "expected_status": "answered",
+      "actual_status": "answered",
+      "expected_fact_ids": [
+        "f.pressure.legacy",
+        "f.revision.3_2_date",
+        "f.sensor.ps04_superseded"
+      ],
+      "returned_fact_ids": [
+        "f.pressure.legacy",
+        "f.revision.3_2_date",
+        "f.sensor.ps04_superseded"
+      ],
+      "fact_recall": 1.0,
+      "expected_citations": 5,
+      "valid_citations": 5,
+      "correct": true,
+      "answer": "Before software revision 3.2, the normal HPU discharge pressure setpoint was 180 bar, measured by sensor PS-04. ECN-1042 introduced the change to PS-04A and 200 bar at revision 3.2."
+    },
+    {
+      "id": "Q19",
+      "question": "What is the maximum continuous operating temperature of PS-04A?",
+      "expected_route": "sensor_temperature",
+      "actual_route": "sensor_temperature",
+      "expected_status": "abstained",
+      "actual_status": "abstained",
+      "expected_fact_ids": [
+        "f.document.absence.temp"
+      ],
+      "returned_fact_ids": [
+        "f.document.absence.temp"
+      ],
+      "fact_recall": 1.0,
+      "expected_citations": 2,
+      "valid_citations": 2,
+      "correct": true,
+      "answer": "The supplied package does not specify a maximum continuous operating temperature for PS-04A. The scanned calibration record gives calibration points and the HPU discharge line location, but it is an uncontrolled calibration copy rather than an operating-temperature specification."
+    },
+    {
+      "id": "Q20",
+      "question": "What is the calibration interval for the electrical system diagram's voltage sensor?",
+      "expected_route": "voltage_calibration_interval",
+      "actual_route": "voltage_calibration_interval",
+      "expected_status": "abstained",
+      "actual_status": "abstained",
+      "expected_fact_ids": [
+        "f.document.absence.voltage_sensor",
+        "f.electrical.supply"
+      ],
+      "returned_fact_ids": [
+        "f.document.absence.voltage_sensor",
+        "f.electrical.supply"
+      ],
+      "fact_recall": 1.0,
+      "expected_citations": 3,
+      "valid_citations": 3,
+      "correct": true,
+      "answer": "The supplied electrical diagram does not identify a voltage sensor. It labels a 24 VDC sensor-loop supply and a pressure transducer loop. No calibration interval for a voltage sensor is provided in the package."
+    },
+    {
+      "id": "Q21",
+      "question": "Who approved engineering bulletin ECN-1058?",
+      "expected_route": "ecn_approver",
+      "actual_route": "ecn_approver",
+      "expected_status": "abstained",
+      "actual_status": "abstained",
+      "expected_fact_ids": [
+        "f.document.absence.ecn_approval"
+      ],
+      "returned_fact_ids": [
+        "f.document.absence.ecn_approval"
+      ],
+      "fact_recall": 1.0,
+      "expected_citations": 1,
+      "valid_citations": 1,
+      "correct": true,
+      "answer": "The approver of ECN-1058 is not identified in the supplied notice. Its header gives its title, effective date, references, and Released status, but no approver or approval signature."
+    },
+    {
+      "id": "Q22",
+      "question": "What is the mean time between failures for the isolation valve IV-21?",
+      "expected_route": "valve_mtbf",
+      "actual_route": "valve_mtbf",
+      "expected_status": "abstained",
+      "actual_status": "abstained",
+      "expected_fact_ids": [
+        "f.document.absence.mtbf"
+      ],
+      "returned_fact_ids": [
+        "f.document.absence.mtbf"
+      ],
+      "fact_recall": 1.0,
+      "expected_citations": 1,
+      "valid_citations": 1,
+      "correct": true,
+      "answer": "The package does not state an MTBF or failure rate for IV-21. The component register gives its name, aliases, location, and startup note."
+    },
+    {
+      "id": "Q23",
+      "question": "Is the Aegis Series-7 HCS compatible with a 3-phase 400V supply?",
+      "expected_route": "power_compatibility",
+      "actual_route": "power_compatibility",
+      "expected_status": "abstained",
+      "actual_status": "abstained",
+      "expected_fact_ids": [
+        "f.document.absence.400v"
+      ],
+      "returned_fact_ids": [
+        "f.document.absence.400v"
+      ],
+      "fact_recall": 1.0,
+      "expected_citations": 2,
+      "valid_citations": 2,
+      "correct": true,
+      "answer": "The supplied package does not establish compatibility with a three-phase 400 V supply. The electrical drawing and component register mention a 480 V incoming disconnect and 480:120 V control transformer, but they do not specify three-phase 400 V compatibility. Treat that compatibility as unknown."
+    }
+  ]
+}
