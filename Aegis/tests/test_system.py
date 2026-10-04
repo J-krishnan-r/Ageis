@@ -5,7 +5,10 @@ from http.server import ThreadingHTTPServer
 from pathlib import Path
 import threading
 import unittest
+from urllib.parse import urlencode
 from urllib.request import Request, urlopen
+from io import BytesIO
+from PIL import Image
 
 from aegis.evaluate import run_benchmark
 from aegis.system import PROJECT_DIR, answer_question, ensure_index, resolve_entities, validate_knowledge
@@ -74,11 +77,43 @@ class AegisSystemTests(unittest.TestCase):
         thread.start()
         base = f"http://127.0.0.1:{server.server_port}"
         try:
+            with urlopen(base + "/", timeout=10) as result:
+                self.assertIn("img-src 'self'", result.headers["Content-Security-Policy"])
             with urlopen(base + "/health", timeout=10) as result:
                 health = json.loads(result.read())
                 self.assertEqual(result.status, 200)
                 self.assertEqual(result.headers["X-Content-Type-Options"], "nosniff")
             self.assertEqual((health["indexed_files"], health["segments"]), (20, 121))
+            with urlopen(base + "/source/aegis-dataset/aegis-dataset/manuals/operator_manual.pdf", timeout=10) as result:
+                self.assertEqual(result.status, 200)
+                self.assertEqual(result.headers["Content-Type"], "application/pdf")
+                self.assertTrue(result.headers["Content-Disposition"].startswith("inline"))
+                self.assertTrue(result.read(5).startswith(b"%PDF"))
+            with urlopen(base + "/source/aegis-dataset/aegis-dataset/screenshots/screen_03_diagnostics.png", timeout=10) as result:
+                self.assertEqual(result.status, 200)
+                self.assertEqual(result.headers["Content-Type"], "image/png")
+                self.assertTrue(result.headers["Content-Disposition"].startswith("inline"))
+                self.assertEqual(result.read(8), b"\x89PNG\r\n\x1a\n")
+            with urlopen(base + "/source-view/aegis-dataset/aegis-dataset/manuals/legacy_manual_v1.html", timeout=10) as result:
+                self.assertEqual(result.status, 200)
+                self.assertIn("text/html", result.headers["Content-Type"])
+                self.assertIn("Content-Security-Policy", result.headers)
+            with urlopen(base + "/source-view/aegis-dataset/aegis-dataset/reference/component_register.xlsx?" + urlencode({"quote": "PS-04A | Pressure Sensor 04A | P04A; PS04A", "locator": "Components!A5:F5"}), timeout=10) as result:
+                self.assertEqual(result.status, 200)
+                self.assertIn("text/html", result.headers["Content-Type"])
+                self.assertIn(b"<mark>PS-04A</mark>", result.read())
+            preview_query = urlencode({"page": 1, "quote": "This is the normal operating pressure for software revision 3.2 and later."})
+            with urlopen(base + "/source-preview/aegis-dataset/aegis-dataset/manuals/operator_manual.pdf?" + preview_query, timeout=20) as result:
+                self.assertEqual(result.status, 200)
+                self.assertEqual(result.headers["Content-Type"], "image/png")
+                preview = result.read()
+                self.assertEqual(preview[:8], b"\x89PNG\r\n\x1a\n")
+            pixels = Image.open(BytesIO(preview)).convert("RGB").tobytes()
+            # The citation overlay should be present but translucent enough to
+            # keep the document text readable beneath it.
+            self.assertTrue(any(pixels[i] > pixels[i + 1] + 3 and pixels[i + 1] > 200 and 160 < pixels[i + 2] < 240 for i in range(0, len(pixels), 3)))
+            with self.assertRaises(Exception):
+                urlopen(base + "/source/aegis-dataset/aegis-dataset/%2e%2e/%2e%2e/README.md", timeout=10)
             request = Request(base + "/api/ask", data=json.dumps({"question": "Where is IV-21 located?"}).encode(), headers={"Content-Type": "application/json"}, method="POST")
             with urlopen(request, timeout=10) as result:
                 answer = json.loads(result.read())
