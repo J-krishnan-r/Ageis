@@ -16,7 +16,7 @@ python -m aegis evaluate
 python -m aegis serve
 ```
 
-Open <http://127.0.0.1:8765> in a browser. Stop the server with Ctrl+C. The server listens on loopback by default and refuses public bind addresses. No API key, model endpoint, or network call is required. The assessment source package remains in the sibling `../aegis-dataset/aegis-dataset/` folder.
+Open <http://127.0.0.1:8765> in a browser. Stop the server with Ctrl+C. The server listens on loopback by default and refuses public bind addresses. Deterministic rule answers work without a model credential. To enable natural-language rephrasing and answers for unmatched questions, set `GROQ_API_KEY` in the environment or a local, untracked `.env` file. The configured Groq endpoint is called through LiteLLM; requests include the question and selected source evidence. Without a key, or if the model call fails, rule answers remain deterministic and unmatched questions return an evidence-based abstention. The assessment source package remains in the sibling `../aegis-dataset/aegis-dataset/` folder.
 
 To use the command line instead of the browser:
 
@@ -30,13 +30,14 @@ python -m aegis ingest --force
 
 ## What is included
 
-- `aegis/`: file extractors, index management, entity resolution, deterministic query service, evaluation harness, CLI, and loopback web app.
+- `aegis/`: file extractors, index management, entity resolution, deterministic and AI-assisted query service, evaluation harness, CLI, and loopback web app.
 - `aegis/knowledge/entities.json`: canonical identities, declared aliases, and entity relationships.
 - `aegis/knowledge/facts.json`: typed, version-scoped facts with provenance, confidence class, and evidence quotes.
 - `aegis/knowledge/answer_rules.json`: explicit answer and abstention rules used by both the CLI and web API.
 - `aegis/knowledge/visual_evidence.json`: reviewed image, diagram, and scanned-page transcriptions with page or normalized image region locations.
 - `aegis/benchmarks/questions.json`: transcribed assessment questions and a locally curated expected-route/fact key.
 - `ARCHITECTURE.md`: design report, pipeline, confidence and loss analysis, and known limits.
+- `AUTHORS_NOTE.md`: implementation constraints and the fuller hybrid RAG approach the author would prefer.
 - `reports/EVALUATION.md`, `reports/evaluation_results.csv`, and `reports/evaluation_results.json`: results for all 23 prompts.
 
 ## Extraction and source reliability
@@ -53,8 +54,8 @@ The assessment supplies no official gold answers or scoring rubric. The answer k
 
 ## Scope and limitations
 
-This is a self-contained, reviewable system for the supplied fictional dataset. Intent routing is deterministic and based on the documented rule file. If no rule matches, the system returns indexed text excerpts and explicitly abstains from synthesizing a new answer. A local administrator can add a reviewed fact, rule, or transcription while preserving the source path and location. It does not generate recommendations from raw evidence or state that it covers an external Aegis product.
+This is a reviewable system for the supplied fictional dataset. Intent routing is deterministic and based on the documented rule file. If no rule matches, the system retrieves source excerpts and, when configured, asks the model to answer using those excerpts and relevant curated claims. It validates that citations refer to evidence supplied in the request and abstains when the model cannot support an answer. The model can still omit relevant evidence or make unsupported inferences, so review the cited passages for important decisions. A local administrator can add a reviewed fact, rule, or transcription while preserving the source path and location. The application describes only this fictional dataset and does not establish anything about an external Aegis product.
 
 The brief describes 12-page and 18-page manuals, but the actual supplied operator and maintenance PDFs contain two and one pages, respectively. The system indexes the files that exist and does not invent missing sections. The calibration appendix itself says that the applicable maintenance calibration schedule is not included. The planned revision 3.3 row in the supplied revision history is retained as source text; a planned date in a file does not prove that the release happened or that later changes were unchanged.
 
-The search fallback uses SQLite FTS5 when available, with a SQLite `LIKE` fallback. The HTTP interface has no external authentication and is restricted to loopback for local use. Put it behind an authenticated gateway before any shared-network deployment. Visual transcriptions are reviewed for this dataset; new scans or image-only inputs require their own reviewed transcription before their text can support a claim.
+Search uses SQLite FTS5 when available, with a SQLite `LIKE` fallback. The AI layer adds external-service availability, latency, quota, privacy, cost, and context-window limits; the retry button sends the same question through the same retrieval path again. The HTTP interface has no external authentication and is restricted to loopback for local use. Put it behind an authenticated gateway before any shared-network deployment. Visual transcriptions are reviewed for this dataset; new scans or image-only inputs require their own reviewed transcription before their text can support a claim.

@@ -1,17 +1,21 @@
 from __future__ import annotations
 
 import json
+import os
+import sys
 from http.server import ThreadingHTTPServer
 from pathlib import Path
 import threading
 import unittest
+from types import SimpleNamespace
+from unittest.mock import patch
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from io import BytesIO
 from PIL import Image
 
 from aegis.evaluate import run_benchmark
-from aegis.system import PROJECT_DIR, answer_question, ensure_index, resolve_entities, validate_knowledge
+from aegis.system import PROJECT_DIR, _grounded_fallback_answer, _search, answer_question, choose_rule, ensure_index, load_catalog, resolve_entities, validate_knowledge
 from aegis.web import Handler
 
 
@@ -70,6 +74,35 @@ class AegisSystemTests(unittest.TestCase):
         self.assertEqual(response["status"], "insufficient_evidence")
         self.assertEqual(response["route_id"], "fallback_search")
         self.assertEqual(response["claims"], [])
+
+    def test_field_observation_does_not_match_normal_pressure_rule(self):
+        _facts, rules = load_catalog()
+        self.assertIsNone(choose_rule("Can the field note's roughly 175 bar reading be treated as the controlled normal setpoint?", rules))
+
+    def test_retrieval_prioritizes_exact_firmware_revision_and_wiring_diagram(self):
+        revision = _search("What does the supplied revision history say about software 3.3, and does the package show a released change?")
+        self.assertEqual(revision[0]["locator"], "Sheet Revision History, row 6, cells A6:D6")
+        wiring = _search("In the wiring diagram, what devices are associated with TB-7's J-14 and J-15 branches?")
+        self.assertEqual(Path(wiring[0]["source_path"]).name, "wiring_diagram.pdf")
+
+    def test_grounded_fallback_accepts_answer_only_with_valid_citation(self):
+        completion_result = SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=json.dumps({
+            "status": "answered", "answer": "J-14 is the pressure transducer and J-15 is the IV-21 solenoid.", "citation_ids": [1]
+        })))])
+        passages = [{"source_path": "dataset/wiring_diagram.pdf", "locator": "p. 1", "text": "J-14 PRESSURE XDCR; J-15 IV-21 SOLENOID"}]
+        fake_litellm = SimpleNamespace(completion=lambda **_kwargs: completion_result)
+        with patch.dict(os.environ, {"GROQ_API_KEY": "test-key"}), patch.dict(sys.modules, {"litellm": fake_litellm}):
+            generated = _grounded_fallback_answer("What is wired at J-14 and J-15?", {}, passages)
+        self.assertEqual(generated["status"], "answered")
+        self.assertEqual(len(generated["evidence"]), 1)
+        self.assertEqual(generated["evidence"][0]["source"], "dataset/wiring_diagram.pdf")
+
+    def test_fallback_citation_shape_is_ready_for_web_client_without_ai(self):
+        with patch.dict(os.environ, {"GROQ_API_KEY": ""}):
+            response = answer_question("How is the HPU referred to in the terminology glossary?")
+        self.assertEqual(response["route_id"], "fallback_search")
+        self.assertTrue(response["evidence"])
+        self.assertTrue(all(item.get("source") and item.get("quote") for item in response["evidence"]))
 
     def test_local_http_health_and_answer_endpoints(self):
         server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)

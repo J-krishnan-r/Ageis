@@ -1,0 +1,1124 @@
+[
+  {
+    "id": "D01",
+    "question": "For the current Operator Manual, what interlocks must be satisfied before startup, and what are the first two steps after that?",
+    "expected": "Before startup, fluid must be in the normal sight-glass band, IV-21 open, E-stop reset, and access panel closed. Then turn POWER ON and press START; verify the firmware-appropriate pressure target.",
+    "sources": "manuals/operator_manual.pdf p.1 §4.3; configuration/configuration_export.json $.startup_interlocks",
+    "actual": {
+      "status": "insufficient_evidence",
+      "route_id": "fallback_search",
+      "answer": "The provided excerpts list the required interlocks (hydraulic fluid level, isolation valve IV-21 open, emergency stop reset, and maintenance panel closed) but do not contain information about the first two steps after startup.",
+      "claims": [],
+      "evidence": [
+        {
+          "source": "aegis-dataset/aegis-dataset/manuals/operator_manual.pdf",
+          "locator": "p. 1, §4.3",
+          "quote": "Hydraulic fluid level is within the normal band on the sight glass.",
+          "extraction_method": "pypdf",
+          "claim_id": "f.startup.fluid",
+          "confidence": "high",
+          "assertion": "direct",
+          "claim": "HPU — startup_interlock: hydraulic fluid level within the normal band on the sight glass"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/manuals/operator_manual.pdf",
+          "locator": "p. 1, §4.3",
+          "quote": "Isolation valve IV-21 is OPEN.",
+          "extraction_method": "pypdf",
+          "claim_id": "f.startup.valve",
+          "confidence": "high",
+          "assertion": "direct",
+          "claim": "HPU — startup_interlock: Isolation Valve IV-21 is OPEN"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/manuals/operator_manual.pdf",
+          "locator": "p. 1, §4.3",
+          "quote": "The emergency stop circuit is RESET.",
+          "extraction_method": "pypdf",
+          "claim_id": "f.startup.estop",
+          "confidence": "high",
+          "assertion": "direct",
+          "claim": "HPU — startup_interlock: The emergency stop circuit is RESET"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/manuals/operator_manual.pdf",
+          "locator": "p. 1, §4.3 warning",
+          "quote": "Do not start the Hydraulic Power Unit with the maintenance access panel removed.",
+          "extraction_method": "pypdf",
+          "claim_id": "f.startup.panel",
+          "confidence": "high",
+          "assertion": "direct",
+          "claim": "HPU — startup_interlock: The maintenance access panel is installed, secured, and CLOSED"
+        }
+      ],
+      "resolved_entities": [],
+      "unresolved": [
+        "No answer rule matched with enough specificity. The system abstained rather than generate an unsupported conclusion."
+      ],
+      "limitations": [
+        "Question routing is deterministic and may require different wording or a documented rule."
+      ]
+    }
+  },
+  {
+    "id": "D02",
+    "question": "How do the normal HPU sensor and pressure target differ between firmware 3.1 and 3.2?",
+    "expected": "Firmware 3.1 uses PS-04 with a 180 bar target. Firmware 3.2 and later use PS-04A with a 200 bar target.",
+    "sources": "manuals/operator_manual.pdf p.1 §2, §4.3; p.2 §5; engineering_bulletins/ECN-1042.pdf p.1 §1; reference/revision_history.xlsx Revision History row 4",
+    "actual": {
+      "status": "answered",
+      "route_id": "normal_pressure",
+      "answer": "In firmware 3.2 and later the HPU’s normal discharge‑pressure setpoint is **200 bar**, measured with the **PS‑04A** sensor.  \nIn firmware versions prior to 3.2 the normal discharge‑pressure setpoint is **180 bar**, measured with the original **PS‑04** sensor.",
+      "claims": [
+        {
+          "id": "f.pressure.current",
+          "subject": "HPU",
+          "predicate": "normal_discharge_pressure",
+          "value": 200,
+          "unit": "bar",
+          "scope": {
+            "firmware": "3.2 or later",
+            "active_sensor": "PS-04A"
+          },
+          "confidence": "high",
+          "assertion": "direct"
+        },
+        {
+          "id": "f.pressure.legacy",
+          "subject": "HPU",
+          "predicate": "normal_discharge_pressure",
+          "value": 180,
+          "unit": "bar",
+          "scope": {
+            "firmware": "before 3.2",
+            "active_sensor": "PS-04"
+          },
+          "confidence": "high",
+          "assertion": "direct"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "aegis-dataset/aegis-dataset/manuals/operator_manual.pdf",
+          "locator": "p. 1, §4.3 and §5; p. 2",
+          "quote": "This is the normal operating pressure for software revision 3.2 and later.",
+          "extraction_method": "pypdf",
+          "claim_id": "f.pressure.current",
+          "confidence": "high"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/engineering_bulletins/ECN-1042.pdf",
+          "locator": "p. 1, §1",
+          "quote": "the normal HPU discharge pressure setpoint is revised from 180 bar to 200 bar.",
+          "extraction_method": "pypdf",
+          "claim_id": "f.pressure.current",
+          "confidence": "high"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/manuals/operator_manual.pdf",
+          "locator": "p. 2, §5",
+          "quote": "On revisions prior to 3.2, normal discharge pressure was 180 bar, measured by the original PS-04 sensor.",
+          "extraction_method": "pypdf",
+          "claim_id": "f.pressure.legacy",
+          "confidence": "high"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/manuals/legacy_manual_v1.html",
+          "locator": "§5 Normal Operating Ranges",
+          "quote": "Normal HPU discharge pressure is 180 bar, as measured by pressure sensor PS-04.",
+          "extraction_method": "html.parser",
+          "claim_id": "f.pressure.legacy",
+          "confidence": "high"
+        }
+      ],
+      "resolved_entities": [
+        {
+          "canonical_id": "HPU",
+          "type": "assembly",
+          "matched_alias": "HPU",
+          "matched_text": "HPU"
+        }
+      ],
+      "unresolved": [],
+      "limitations": [
+        "The system describes only the supplied, fictional documentation package and makes no claim about a real Aegis product or any live machine."
+      ]
+    }
+  },
+  {
+    "id": "D03",
+    "question": "Does ECN-1058 retune A17, or only correct the sensor reference used to evaluate it? What stays unchanged?",
+    "expected": "ECN-1058 corrects the active sensor reference by firmware and is documentation-only. Alarm thresholds (150 bar low and 220 bar high) and the normal operating setpoint remain unchanged.",
+    "sources": "engineering_bulletins/ECN-1058.pdf p.1 §1–2; reference/alarm_reference.pdf p.1 sensor-reference note",
+    "actual": {
+      "status": "answered",
+      "route_id": "fallback_search",
+      "answer": "ECN‑1058 does not retune Alarm A17; it only corrects the documentation so that the alarm’s low‑pressure condition is evaluated against whichever pressure sensor (PS‑04 or PS‑04A) is active for the installed software revision. The alarm’s threshold values (150 bar low‑pressure, 220 bar high‑pressure) and the underlying alarm logic remain unchanged, and no firmware or hardware changes are required.",
+      "claims": [],
+      "evidence": [
+        {
+          "source": "aegis-dataset/aegis-dataset/reference/revision_history.xlsx",
+          "locator": "Revision History!A5:D5",
+          "quote": "3.2.1 | 2025-11-18 | Documentation correction: Alarm A17 condition text no longer names a specific sensor (PS-04 or PS-04A) ... Alarm thresholds unchanged. See ECN-1058.",
+          "extraction_method": "openpyxl",
+          "claim_id": "f.revision.3_2_1_change",
+          "confidence": "high",
+          "assertion": "direct",
+          "claim": "firmware 3.2.1 — change_summary: Documentation correction: A17 names whichever sensor is active by software revision. Alarm thresholds did not change. ECN-1058."
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/reference/alarm_reference.pdf",
+          "locator": "p. 1, AEG-AL-700 Rev 5, sensor note",
+          "quote": "The 150 bar and 220 bar thresholds shown above are unchanged by ECN-1058.",
+          "extraction_method": "pypdf",
+          "claim_id": "f.a17.threshold_unchanged",
+          "confidence": "high",
+          "assertion": "direct",
+          "claim": "A17 — low_threshold: 150"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/engineering_bulletins/ECN-1058.pdf",
+          "locator": "Page 1",
+          "quote": "Engineering Change Notice [ECN]-[1058] Engineering Change Notice [ECN]-[1058] [ECN] Number: [ECN]-[1058] Title: Alarm [A17] Threshold [Reference] Correction Effective: Immediately upon publication References: [ECN]-1042 Status: Released 1. Description of Change The Alarm [Reference] … ",
+          "extraction_method": "indexed_source_excerpt"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/reference/alarm_reference.pdf",
+          "locator": "Page 1",
+          "quote": " … A19 Pressure [sensor] RED 1. [Sensor] wiring fault Replace [sensor] per signal invalid 2. [Sensor] drift beyond Maintenance Manual tolerance (see [ECN]-1042) Section 6. * Shutdown Procedure 4.7 applies [only] when [A17] persists beyond 10 … ",
+          "extraction_method": "indexed_source_excerpt"
+        }
+      ],
+      "resolved_entities": [
+        {
+          "canonical_id": "A17",
+          "type": "alarm",
+          "matched_alias": "A17",
+          "matched_text": "A17"
+        }
+      ],
+      "unresolved": [
+        "No answer rule matched with enough specificity. The system abstained rather than generate an unsupported conclusion."
+      ],
+      "limitations": [
+        "Question routing is deterministic and may require different wording or a documented rule."
+      ]
+    }
+  },
+  {
+    "id": "D04",
+    "question": "Once A17 lasts past the 10-second point, what actions make up the required shutdown?",
+    "expected": "Follow Shutdown Procedure 4.7: close IV-21, confirm pressure decay, switch POWER off, apply LOTO, and troubleshoot. Do not only silence the alarm.",
+    "sources": "manuals/maintenance_manual.pdf p.1 §4 and Shutdown Procedure 4.7; reference/alarm_reference.pdf p.1 A17 row and footnote",
+    "actual": {
+      "status": "answered",
+      "route_id": "alarm_a17_persistent_action",
+      "answer": "If alarm A17 remains active for more than 10 seconds, you must follow Shutdown Procedure 4.7. The required steps are:\n\n1. Close valve IV‑21.  \n2. Verify that system pressure is decaying.  \n3. Set the POWER selector to OFF.  \n4. Apply the site lockout/tagout procedure.  \n5. After the shutdown, proceed with troubleshooting.\n\nSimply silencing the alarm is not an acceptable response.",
+      "claims": [
+        {
+          "id": "f.a17.response",
+          "subject": "A17",
+          "predicate": "persistent_alarm_response",
+          "value": "If A17 persists more than 10 seconds, run Shutdown Procedure 4.7: close IV-21, confirm pressure decay, set POWER to OFF, apply site lockout/tagout, then troubleshoot. Do not silence the alarm as the sole response.",
+          "scope": {
+            "persistence": "greater than 10 seconds"
+          },
+          "confidence": "high",
+          "assertion": "direct"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "aegis-dataset/aegis-dataset/manuals/maintenance_manual.pdf",
+          "locator": "p. 1, §4 and Shutdown Procedure 4.7",
+          "quote": "If alarm A17 persists for more than 10 seconds, execute Shutdown Procedure 4.7 ... close IV-21, confirm pressure decay, set POWER selector to OFF, tag out per site lockout/tagout procedure",
+          "extraction_method": "pypdf",
+          "claim_id": "f.a17.response",
+          "confidence": "high"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/reference/alarm_reference.pdf",
+          "locator": "p. 1, A17 row and footnote",
+          "quote": "If persistent > 10 s, run Shutdown Proc. 4.7. A transient A17 that clears on its own during normal valve transition does not require Procedure 4.7.",
+          "extraction_method": "pypdf",
+          "claim_id": "f.a17.response",
+          "confidence": "high"
+        }
+      ],
+      "resolved_entities": [
+        {
+          "canonical_id": "A17",
+          "type": "alarm",
+          "matched_alias": "A17",
+          "matched_text": "A17"
+        }
+      ],
+      "unresolved": [],
+      "limitations": [
+        "The system describes only the supplied, fictional documentation package and makes no claim about a real Aegis product or any live machine."
+      ]
+    }
+  },
+  {
+    "id": "D05",
+    "question": "For A18, what pressure condition and causes are listed, and what restart restriction follows?",
+    "expected": "A18 indicates pressure above 220 bar; listed causes are a relief-valve fault or setpoint misconfiguration. Stop the HPU and do not restart until pressure relief is verified.",
+    "sources": "reference/alarm_reference.pdf p.1 A18 row; configuration/configuration_export.json $.sensors.sensor_ps04a_alarm_high_bar",
+    "actual": {
+      "status": "insufficient_evidence",
+      "route_id": "fallback_search",
+      "answer": "I could not find a matching supported claim for this question. Here are the closest indexed passages. Their presence does not by itself establish an answer.",
+      "claims": [],
+      "evidence": [
+        {
+          "source": "aegis-dataset/aegis-dataset/reference/alarm_reference.pdf",
+          "locator": "Page 1",
+          "quote": " … 4.7* signal invalid [A18] Hydraulic [pressure] AMBER 1. Relief valve fault Stop the HPU. Do not above 220 bar 2. Setpoint [restart] until [pressure] misconfiguration relief is verified. A19 [Pressure] sensor RED 1. Sensor wiring … ",
+          "extraction_method": "indexed_source_excerpt",
+          "segment_id": "1148e6520bb84da5a99d"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/configuration/configuration_export.json",
+          "locator": "$.alarms.A18.description",
+          "quote": "$.alarms.[A18].description = \"hydraulic_[pressure]_high\"",
+          "extraction_method": "indexed_source_excerpt",
+          "segment_id": "fba0382c25399a5876ce"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/reference/component_register.xlsx",
+          "locator": "Sheet Components, row 9, cells A9:F9",
+          "quote": "A9=[A18] | B9=Alarm: Hydraulic [Pressure] High | C9=— | D9=N/A (software alarm) | E9=Active | F9=See Alarm Reference AEG-AL-700.",
+          "extraction_method": "indexed_source_excerpt",
+          "segment_id": "5c0f368aed2a8f3cb799"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/manuals/operator_manual.pdf",
+          "locator": "Page 2",
+          "quote": " … Alarms See the Aegis Alarm Reference (AEG-AL-700) for the full alarm list, including alarm A17 (Hydraulic [Pressure] Low), its possible [causes], and required operator actions. 7. Controller Reset Do not reset the PLC-03 … ",
+          "extraction_method": "indexed_source_excerpt",
+          "segment_id": "de220170e97cc6b294d1"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/screenshots/screen_02_alarms.png",
+          "locator": "Alarm list and A17 timer",
+          "quote": " … A17 Hydraulic [Pressure] Low CLEARED at 08:14:02; A19 [Pressure] Sensor Signal Invalid CLEARED at 03-11 22:40; A17 Hydraulic [Pressure] Low ACTIVE at 08:14:57; [A18] Hydraulic [Pressure] High INACTIVE. Banner: Alarm … ",
+          "extraction_method": "indexed_source_excerpt",
+          "segment_id": "316fe9d4e510f93a97a4"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/engineering_bulletins/ECN-1058.pdf",
+          "locator": "Page 1",
+          "quote": " … Alarm A17's low-[pressure] [condition] is evaluated against whichever [pressure] sensor is active for the installed software revision (PS-04 prior to revision 3.2, PS-04A on revision 3.2 and later). The alarm … ",
+          "extraction_method": "indexed_source_excerpt",
+          "segment_id": "d457cf9029b4192914ad"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/configuration/configuration_export.json",
+          "locator": "$.alarms.A18.persistence_before_shutdown_seconds",
+          "quote": "$.alarms.[A18].persistence_before_shutdown_seconds = null",
+          "extraction_method": "indexed_source_excerpt",
+          "segment_id": "577d394ce34c36505239"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/reference/terminology_glossary.docx",
+          "locator": "Table 1, row 7",
+          "quote": "Alarm | A system-generated notification indicating an out-of-tolerance or fault [condition]. See the Alarm Reference for the current alarm list.",
+          "extraction_method": "indexed_source_excerpt",
+          "segment_id": "78f2049dd2f93dfe141a"
+        }
+      ],
+      "resolved_entities": [
+        {
+          "canonical_id": "A18",
+          "type": "alarm",
+          "matched_alias": "A18",
+          "matched_text": "A18"
+        }
+      ],
+      "unresolved": [
+        "No answer rule matched with enough specificity. The system abstained rather than generate an unsupported conclusion."
+      ],
+      "limitations": [
+        "Question routing is deterministic and may require different wording or a documented rule."
+      ]
+    }
+  },
+  {
+    "id": "D06",
+    "question": "Is PS-04A a form-fit replacement for PS-04 on firmware 3.1?",
+    "expected": "No. PS-04A is not a form-fit-function replacement and requires firmware 3.2 or later; PS-04 is used before 3.2.",
+    "sources": "engineering_bulletins/ECN-1042.pdf p.1 §1; reference/component_register.xlsx Components rows 4–5",
+    "actual": {
+      "status": "answered",
+      "route_id": "sensor_ps04_vs_ps04a",
+      "answer": "No. PS‑04A is not a form‑fit‑function replacement for PS‑04, and it requires controller firmware revision 3.2 or later. Consequently, on firmware 3.1 it cannot serve as a direct replacement.",
+      "claims": [
+        {
+          "id": "f.sensor.ps04_superseded",
+          "subject": "PS-04",
+          "predicate": "superseded_by",
+          "value": "PS-04A",
+          "scope": {
+            "firmware": "3.2 or later"
+          },
+          "confidence": "high",
+          "assertion": "direct"
+        },
+        {
+          "id": "f.sensor.not_form_fit",
+          "subject": "PS-04A",
+          "predicate": "replacement_compatibility",
+          "value": "PS-04A is not a form-fit-function replacement for PS-04 and requires controller firmware 3.2 or later.",
+          "scope": {
+            "firmware": "3.2 or later"
+          },
+          "confidence": "high",
+          "assertion": "direct"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "aegis-dataset/aegis-dataset/engineering_bulletins/ECN-1042.pdf",
+          "locator": "p. 1, §1",
+          "quote": "pressure sensor PS-04 is replaced by pressure sensor PS-04A at the HPU discharge line.",
+          "extraction_method": "pypdf",
+          "claim_id": "f.sensor.ps04_superseded",
+          "confidence": "high"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/reference/component_register.xlsx",
+          "locator": "Components!A4:F5",
+          "quote": "PS-04 | Pressure Sensor 04 | ... | Superseded | Superseded by PS-04A effective software rev 3.2.",
+          "extraction_method": "openpyxl",
+          "claim_id": "f.sensor.ps04_superseded",
+          "confidence": "high"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/engineering_bulletins/ECN-1042.pdf",
+          "locator": "p. 1, §1",
+          "quote": "PS-04A uses an updated signal conditioning circuit and is not a form-fit-function replacement for PS-04; controller firmware must be at revision 3.2 or later to read PS-04A correctly.",
+          "extraction_method": "pypdf",
+          "claim_id": "f.sensor.not_form_fit",
+          "confidence": "high"
+        }
+      ],
+      "resolved_entities": [
+        {
+          "canonical_id": "PS-04A",
+          "type": "pressure_sensor",
+          "matched_alias": "P.S.04-A",
+          "matched_text": "PS-04A"
+        },
+        {
+          "canonical_id": "PS-04",
+          "type": "pressure_sensor",
+          "matched_alias": "PS-04",
+          "matched_text": "PS-04"
+        }
+      ],
+      "unresolved": [],
+      "limitations": [
+        "The system describes only the supplied, fictional documentation package and makes no claim about a real Aegis product or any live machine."
+      ]
+    }
+  },
+  {
+    "id": "D07",
+    "question": "What faults can cause an A17 low-pressure event, and which sensor is checked on newer software?",
+    "expected": "Causes include IV-21 being closed or partly closed, low fluid, or an invalid sensor signal. The active sensor is PS-04 before firmware 3.2 and PS-04A on 3.2 or later.",
+    "sources": "reference/alarm_reference.pdf p.1 A17 row and sensor note; engineering_bulletins/ECN-1058.pdf p.1 §1",
+    "actual": {
+      "status": "answered",
+      "route_id": "fallback_search",
+      "answer": "A17 can be triggered by a closed or partially closed IV-21 isolation valve, low hydraulic fluid level, or an invalid pressure‑sensor signal. On software revisions 3.2 and later the alarm checks the pressure reading from sensor PS‑04A (the active sensor for those revisions).",
+      "claims": [],
+      "evidence": [
+        {
+          "source": "aegis-dataset/aegis-dataset/reference/alarm_reference.pdf",
+          "locator": "p. 1, AEG-AL-700 Rev 5, A17 row and sensor note",
+          "quote": "Hydraulic pressure below 150 bar ... whichever pressure sensor is active for the installed software revision (PS-04 or PS-04A).",
+          "extraction_method": "pypdf",
+          "claim_id": "f.a17.low_condition",
+          "confidence": "high",
+          "assertion": "direct",
+          "claim": "A17 — condition: The active pressure sensor reading is below 150 bar."
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/reference/alarm_reference.pdf",
+          "locator": "p. 1, AEG-AL-700 Rev 5, A17 row",
+          "quote": "1. IV-21 closed or partially closed; 2. Low hydraulic fluid; 3. Pressure sensor signal invalid",
+          "extraction_method": "pypdf",
+          "claim_id": "f.a17.causes",
+          "confidence": "high",
+          "assertion": "direct",
+          "claim": "A17 — possible_causes: ['IV-21 closed or partially closed', 'Low hydraulic fluid', 'Pressure sensor signal invalid']"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/reference/revision_history.xlsx",
+          "locator": "Revision History!A5:D5",
+          "quote": "3.2.1 | 2025-11-18 | Documentation correction: Alarm A17 condition text no longer names a specific sensor (PS-04 or PS-04A) ... Alarm thresholds unchanged. See ECN-1058.",
+          "extraction_method": "openpyxl",
+          "claim_id": "f.revision.3_2_1_change",
+          "confidence": "high",
+          "assertion": "direct",
+          "claim": "firmware 3.2.1 — change_summary: Documentation correction: A17 names whichever sensor is active by software revision. Alarm thresholds did not change. ECN-1058."
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/engineering_bulletins/ECN-1058.pdf",
+          "locator": "Page 1",
+          "quote": " … Alarm [A17]'s [low]-[pressure] condition is evaluated against whichever [pressure] [sensor] is active for the installed [software] revision (PS-04 prior to revision 3.2, PS-04A on revision 3.2 and later). The alarm … ",
+          "extraction_method": "indexed_source_excerpt"
+        }
+      ],
+      "resolved_entities": [
+        {
+          "canonical_id": "A17",
+          "type": "alarm",
+          "matched_alias": "A17",
+          "matched_text": "A17"
+        }
+      ],
+      "unresolved": [
+        "No answer rule matched with enough specificity. The system abstained rather than generate an unsupported conclusion."
+      ],
+      "limitations": [
+        "Question routing is deterministic and may require different wording or a documented rule."
+      ]
+    }
+  },
+  {
+    "id": "D08",
+    "question": "What does the documentation say about resetting PLC-03 when pressure is exactly 50 bar?",
+    "expected": "Reset is permitted only below 50 bar and forbidden above 50 bar. The supplied documentation does not specify what to do at exactly 50 bar.",
+    "sources": "manuals/maintenance_manual.pdf p.1 §3; manuals/operator_manual.pdf p.2 §7; configuration/configuration_export.json $.controller_reset",
+    "actual": {
+      "status": "answered",
+      "route_id": "controller_reset",
+      "answer": "The documentation permits resetting PLC‑03 only after the active pressure sensor reads **below 50 bar** and explicitly forbids resetting while pressure is **above 50 bar**. It does not specify what should be done when the pressure is exactly 50 bar.",
+      "claims": [
+        {
+          "id": "f.reset.limit",
+          "subject": "PLC-03",
+          "predicate": "reset_pressure_condition",
+          "value": "Only reset after the active sensor reads below 50 bar. Do not reset when pressure is above 50 bar; the documentation does not state the disposition at exactly 50 bar.",
+          "scope": {
+            "sensor": "PS-04 before revision 3.2; PS-04A at revision 3.2 and later"
+          },
+          "confidence": "high",
+          "assertion": "direct"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "aegis-dataset/aegis-dataset/manuals/maintenance_manual.pdf",
+          "locator": "p. 1, §3",
+          "quote": "controller reset is only permitted when pressure ... reads below 50 bar.",
+          "extraction_method": "pypdf",
+          "claim_id": "f.reset.limit",
+          "confidence": "high"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/manuals/operator_manual.pdf",
+          "locator": "p. 2, §7",
+          "quote": "Do not reset the PLC-03 controller while hydraulic pressure is above 50 bar.",
+          "extraction_method": "pypdf",
+          "claim_id": "f.reset.limit",
+          "confidence": "high"
+        }
+      ],
+      "resolved_entities": [
+        {
+          "canonical_id": "PLC-03",
+          "type": "controller",
+          "matched_alias": "PLC-03",
+          "matched_text": "PLC-03"
+        }
+      ],
+      "unresolved": [],
+      "limitations": [
+        "The system describes only the supplied, fictional documentation package and makes no claim about a real Aegis product or any live machine."
+      ]
+    }
+  },
+  {
+    "id": "D09",
+    "question": "Which named assembly location does the Component Register assign to IV-21?",
+    "expected": "IV-21 is located in the Hydraulic Module.",
+    "sources": "reference/component_register.xlsx Components row 3",
+    "actual": {
+      "status": "answered",
+      "route_id": "valve_location",
+      "answer": "The Component Register assigns IV‑21 to the **Hydraulic Module**.",
+      "claims": [
+        {
+          "id": "f.valve.location",
+          "subject": "IV-21",
+          "predicate": "registered_location",
+          "value": "Hydraulic Module",
+          "scope": {},
+          "confidence": "high",
+          "assertion": "direct"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "aegis-dataset/aegis-dataset/reference/component_register.xlsx",
+          "locator": "Components!A3:D3",
+          "quote": "IV-21 | Isolation Valve 21 | Isolation Valve; IV21 | Hydraulic Module",
+          "extraction_method": "openpyxl",
+          "claim_id": "f.valve.location",
+          "confidence": "high"
+        }
+      ],
+      "resolved_entities": [
+        {
+          "canonical_id": "IV-21",
+          "type": "valve",
+          "matched_alias": "IV-21",
+          "matched_text": "IV-21"
+        }
+      ],
+      "unresolved": [],
+      "limitations": [
+        "The system describes only the supplied, fictional documentation package and makes no claim about a real Aegis product or any live machine."
+      ]
+    }
+  },
+  {
+    "id": "D10",
+    "question": "How does PS-40's documented location distinguish it from PS-04?",
+    "expected": "PS-40 is in the Coolant Loop, Skid B, and is unrelated to the HPU discharge pressure circuit served by PS-04/PS-04A.",
+    "sources": "reference/component_register.xlsx Components rows 4–6; configuration/configuration_export.json $.sensors.sensor_ps40_zone and sensor_ps40_note",
+    "actual": {
+      "status": "answered",
+      "route_id": "fallback_search",
+      "answer": "PS-40 is documented as being installed in the Coolant Loop, Skid B, and explicitly noted as not part of the HPU discharge circuit, whereas PS‑04 (and PS‑04A) are located on the HPU discharge line.",
+      "claims": [],
+      "evidence": [
+        {
+          "source": "aegis-dataset/aegis-dataset/reference/component_register.xlsx",
+          "locator": "Components!A4:F6",
+          "quote": "PS-40 ... Coolant Loop, Skid B ... NOT related to the HPU discharge circuit. Do not confuse with PS-04 / PS-04A.",
+          "extraction_method": "openpyxl",
+          "claim_id": "f.sensor.ps40_distinct",
+          "confidence": "high",
+          "assertion": "direct",
+          "claim": "PS-40 — different_from: PS-04 and PS-04A"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/reference/component_register.xlsx",
+          "locator": "Sheet Components, row 6, cells A6:F6",
+          "quote": "A6=PS-[40] | B6=Pressure Sensor [40] | C6=P40; PS40 | D6=Coolant Loop, Skid B | E6=Active | F6=NOT related to the HPU discharge circuit. Do not confuse with PS-[04] / PS-04A.",
+          "extraction_method": "indexed_source_excerpt"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/scans/scanned_appendix_calibration.pdf",
+          "locator": "Page 1; Calibration record and results",
+          "quote": " … This calibration record supersedes the field data sheet used prior to the PS-[04] to PS-04A sensor change (see ECN-1042). Span reference target is 200 bar, consistent with software revision 3.2 operating pressure … ",
+          "extraction_method": "indexed_source_excerpt"
+        }
+      ],
+      "resolved_entities": [
+        {
+          "canonical_id": "PS-40",
+          "type": "pressure_sensor",
+          "matched_alias": "PS-40",
+          "matched_text": "PS-40"
+        },
+        {
+          "canonical_id": "PS-04",
+          "type": "pressure_sensor",
+          "matched_alias": "PS-04",
+          "matched_text": "PS-04"
+        }
+      ],
+      "unresolved": [
+        "No answer rule matched with enough specificity. The system abstained rather than generate an unsupported conclusion."
+      ],
+      "limitations": [
+        "Question routing is deterministic and may require different wording or a documented rule."
+      ]
+    }
+  },
+  {
+    "id": "D11",
+    "question": "Does the training slide deck introduce the Auxiliary Reservoir as a new component for every machine?",
+    "expected": "No. It is present on most Line 4/5 configurations, where its small reservoir tops up the main reservoir during peak demand. It is absent from the standard Operator Manual.",
+    "sources": "training/maintenance_training_slides.pptx slide 2; manuals/operator_manual.pdf p.1",
+    "actual": {
+      "status": "answered",
+      "route_id": "training_additions",
+      "answer": "The training slide deck mentions the Auxiliary Reservoir only as a configuration detail for most Line 4/5 setups—it is not presented as a new component that appears on every machine.",
+      "claims": [
+        {
+          "id": "f.training.aux_reservoir",
+          "subject": "Auxiliary Reservoir",
+          "predicate": "configuration_scope",
+          "value": "A training slide describes a smaller Auxiliary Reservoir that tops up the main reservoir during peak demand on most Line 4/5 configurations. This configuration detail is absent from the supplied operator and maintenance manual text.",
+          "scope": {
+            "configuration": "most Line 4/5 configurations, per training slide only"
+          },
+          "confidence": "medium",
+          "assertion": "direct_training_source"
+        },
+        {
+          "id": "f.training.no_new_alarms",
+          "subject": "training_slide_excerpt",
+          "predicate": "alarm_coverage",
+          "value": "The three-slide excerpt discusses HPU terms and startup interlocks; it names no alarm code.",
+          "scope": {
+            "slides": 3
+          },
+          "confidence": "high",
+          "assertion": "direct_document_review"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "aegis-dataset/aegis-dataset/extra/training_slide_excerpt.pptx",
+          "locator": "slide 2",
+          "quote": "on most Line 4/5 configurations, tops up from a smaller Auxiliary Reservoir during peak demand. Note: Auxiliary Reservoir is a Line 4/5-specific configuration detail and is not covered in the standard Operator Manual.",
+          "extraction_method": "python-pptx",
+          "claim_id": "f.training.aux_reservoir",
+          "confidence": "medium"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/extra/training_slide_excerpt.pptx",
+          "locator": "slides 1–3, all slide text and tables",
+          "quote": "Reviewed slide titles, slide text, startup-check table, and speaker notes. No A-series alarm identifier occurs.",
+          "extraction_method": "python-pptx",
+          "claim_id": "f.training.no_new_alarms",
+          "confidence": "high"
+        }
+      ],
+      "resolved_entities": [
+        {
+          "canonical_id": "Auxiliary Reservoir",
+          "type": "reservoir",
+          "matched_alias": "Auxiliary Reservoir",
+          "matched_text": "Auxiliary Reservoir"
+        }
+      ],
+      "unresolved": [],
+      "limitations": [
+        "The system describes only the supplied, fictional documentation package and makes no claim about a real Aegis product or any live machine."
+      ]
+    }
+  },
+  {
+    "id": "D12",
+    "question": "What sensor tag appears in diagnostics and does it match a registered component?",
+    "expected": "The screenshot shows P.S.04-A, which maps to registered PS-04A at the HPU discharge. It shows firmware 3.2.1, a 4–20 mA signal, 200.3 bar and in-tolerance status; it is a screenshot, not live telemetry.",
+    "sources": "screenshots/screen_03_diagnostics_card.png; reference/component_register.xlsx Components row 5",
+    "actual": {
+      "status": "answered",
+      "route_id": "diagnostics_tag",
+      "answer": "The diagnostics screenshot shows the sensor tag **P.S.04‑A** (firmware 3.2.1). This tag corresponds to the registered component **PS‑04A** in the component register (the pressure sensor for the HPU discharge line), so the tag displayed in diagnostics matches a registered component.",
+      "claims": [
+        {
+          "id": "f.diagnostics.tag_variant",
+          "subject": "PS-04A",
+          "predicate": "displayed_tag_variant",
+          "value": "P.S.04-A",
+          "scope": {
+            "firmware": "3.2.1 shown on screenshot"
+          },
+          "confidence": "high",
+          "assertion": "visual_transcription_with_entity_match"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "aegis-dataset/aegis-dataset/screenshots/screen_03_diagnostics.png",
+          "locator": "Sensor Diagnostics card, Tag and Firmware Rev. fields",
+          "quote": "Tag P.S.04-A ... Firmware Rev. 3.2.1. Screen note: this screen displays the sensor tag as printed on the physical unit label.",
+          "extraction_method": "human_transcription",
+          "claim_id": "f.diagnostics.tag_variant",
+          "confidence": "high"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/reference/component_register.xlsx",
+          "locator": "Components!A5:F5",
+          "quote": "PS-04A | Pressure Sensor 04A | P04A; PS04A | HPU discharge line | Active",
+          "extraction_method": "openpyxl",
+          "claim_id": "f.diagnostics.tag_variant",
+          "confidence": "high"
+        }
+      ],
+      "resolved_entities": [
+        {
+          "canonical_id": "PS-04A",
+          "type": "pressure_sensor",
+          "matched_alias": "P.S.04-A",
+          "matched_text": "PS-04A"
+        }
+      ],
+      "unresolved": [],
+      "limitations": [
+        "The system describes only the supplied, fictional documentation package and makes no claim about a real Aegis product or any live machine."
+      ]
+    }
+  },
+  {
+    "id": "D13",
+    "question": "What readings did the PS-04A calibration record show at its three reference points?",
+    "expected": "On 2026-01-09, the record shows 0 bar reference → 0.1 bar, 100 → 99.6 bar, and 200 → 199.4 bar; all three passed. The record is an uncontrolled scan.",
+    "sources": "scans/scanned_appendix_calibration.pdf p.1 Calibration Points table and header",
+    "actual": {
+      "status": "answered",
+      "route_id": "fallback_search",
+      "answer": "Zero (0%): reference 0 bar, reading 0.1 bar (PASS); Mid (50%): reference 100 bar, reading 99.6 bar (PASS); Span (100%): reference 200 bar, reading 199.4 bar (PASS).",
+      "claims": [],
+      "evidence": [
+        {
+          "source": "aegis-dataset/aegis-dataset/scans/scanned_appendix_calibration.pdf",
+          "locator": "p. 1, Calibration Points table",
+          "quote": "Zero (0%): 0 bar, 0.1 bar, PASS. Mid (50%): 100 bar, 99.6 bar, PASS. Span (100%): 200 bar, 199.4 bar, PASS.",
+          "extraction_method": "human_transcription",
+          "claim_id": "f.calibration.results",
+          "confidence": "medium",
+          "assertion": "human_transcribed_from_scan",
+          "claim": "PS-04A — calibration_results: 0 bar reference read 0.1 bar; 100 bar reference read 99.6 bar; 200 bar reference read 199.4 bar; all PASS. Recorded 2026-01-09."
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/scans/scanned_appendix_calibration.pdf",
+          "locator": "Page 1; Calibration record and results",
+          "quote": " … SENSOR [CALIBRATION] [RECORD]. Aegis Series-7 HCS (scanned from field service binder, uncontrolled copy). Sensor Tag: PS-[04A]. Location: HPU discharge line. [Calibration] Date: 2026-01-09. Technician: R. Okafor. [Calibration] [points]: Zero (0%), [reference] 0 … ",
+          "extraction_method": "indexed_source_excerpt"
+        }
+      ],
+      "resolved_entities": [
+        {
+          "canonical_id": "PS-04A",
+          "type": "pressure_sensor",
+          "matched_alias": "P.S.04-A",
+          "matched_text": "PS-04A"
+        }
+      ],
+      "unresolved": [
+        "No answer rule matched with enough specificity. The system abstained rather than generate an unsupported conclusion."
+      ],
+      "limitations": [
+        "Question routing is deterministic and may require different wording or a documented rule."
+      ]
+    }
+  },
+  {
+    "id": "D14",
+    "question": "What periodic recalibration frequency does the PS-04A record prescribe?",
+    "expected": "It specifies no interval. It says to confirm recalibration frequency against the applicable maintenance schedule, which is not included in the binder.",
+    "sources": "scans/scanned_appendix_calibration.pdf p.1 note below table",
+    "actual": {
+      "status": "abstained",
+      "route_id": "calibration_interval_ps04a",
+      "answer": "The scanned calibration record does not specify a periodic recalibration frequency for PS‑04A. It notes that the recalibration interval should be confirmed against the applicable maintenance schedule, which is not included in the provided documents.",
+      "claims": [
+        {
+          "id": "f.calibration.interval_unspecified",
+          "subject": "PS-04A",
+          "predicate": "calibration_interval",
+          "value": null,
+          "scope": {
+            "record": "scanned appendix, not the full maintenance schedule"
+          },
+          "confidence": "high",
+          "assertion": "explicitly_unspecified"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "aegis-dataset/aegis-dataset/scans/scanned_appendix_calibration.pdf",
+          "locator": "p. 1, note below calibration table",
+          "quote": "No calibration interval is specified for PS-04A on this form; recalibration frequency should be confirmed against the applicable maintenance schedule, which is not included in this binder.",
+          "extraction_method": "human_transcription",
+          "claim_id": "f.calibration.interval_unspecified",
+          "confidence": "high"
+        }
+      ],
+      "resolved_entities": [
+        {
+          "canonical_id": "PS-04A",
+          "type": "pressure_sensor",
+          "matched_alias": "P.S.04-A",
+          "matched_text": "PS-04A"
+        }
+      ],
+      "unresolved": [
+        "The supplied evidence does not state the requested value. See the cited scope and missing-information explanation."
+      ],
+      "limitations": [
+        "The system describes only the supplied, fictional documentation package and makes no claim about a real Aegis product or any live machine."
+      ]
+    }
+  },
+  {
+    "id": "D15",
+    "question": "Do the supplied drawings establish that a three-phase 400 V site supply is compatible?",
+    "expected": "No. Compatibility is not established. The register lists a 480 V incoming disconnect and a 480:120 V transformer, but the package gives no phase count or 400 V compatibility statement.",
+    "sources": "diagrams/system_diagram_electrical.png; reference/component_register.xlsx Components rows 12–13",
+    "actual": {
+      "status": "abstained",
+      "route_id": "power_compatibility",
+      "answer": "The supplied drawings do not establish that a three‑phase 400 V site supply is compatible. The electrical diagram and component register only reference a 480 V incoming disconnect and a 480 : 120 V control transformer, with no mention of three‑phase 400 V compatibility. Consequently, the compatibility with a three‑phase 400 V supply is not demonstrated by the provided package.",
+      "claims": [
+        {
+          "id": "f.document.absence.400v",
+          "subject": "Aegis Series-7 HCS",
+          "predicate": "three_phase_400v_compatibility",
+          "value": null,
+          "scope": {
+            "search": "all 20 supplied dataset files"
+          },
+          "confidence": "medium",
+          "assertion": "not_established_by_package"
+        }
+      ],
+      "evidence": [
+        {
+          "source": "aegis-dataset/aegis-dataset/diagrams/system_diagram_electrical.png",
+          "locator": "AEG-DWG-E02 labels",
+          "quote": "The drawing labels a 480:120V control transformer and 24VDC supplies. It gives no three-phase 400V compatibility specification.",
+          "extraction_method": "human_transcription",
+          "claim_id": "f.document.absence.400v",
+          "confidence": "medium"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/reference/component_register.xlsx",
+          "locator": "Components!A12:F13",
+          "quote": "Q1 ... 480V incoming disconnect. T1 ... 480:120V control power.",
+          "extraction_method": "openpyxl",
+          "claim_id": "f.document.absence.400v",
+          "confidence": "medium"
+        }
+      ],
+      "resolved_entities": [],
+      "unresolved": [
+        "The supplied evidence does not state the requested value. See the cited scope and missing-information explanation."
+      ],
+      "limitations": [
+        "The system describes only the supplied, fictional documentation package and makes no claim about a real Aegis product or any live machine."
+      ]
+    }
+  },
+  {
+    "id": "D16",
+    "question": "What incoming voltage and transformer ratio are actually listed for the electrical assembly?",
+    "expected": "The Component Register lists Q1 as a 480 V incoming disconnect and T1 as a 480:120 V control transformer. The drawing also shows 24 VDC PLC and sensor-loop components; no phase count is given.",
+    "sources": "reference/component_register.xlsx Components rows 12–13; diagrams/system_diagram_electrical.png",
+    "actual": {
+      "status": "answered",
+      "route_id": "fallback_search",
+      "answer": "The drawing lists a 480 V incoming supply and a control transformer with a 480:120 V ratio.",
+      "claims": [],
+      "evidence": [
+        {
+          "source": "aegis-dataset/aegis-dataset/diagrams/system_diagram_electrical.png",
+          "locator": "diagram labels and topology",
+          "quote": "MAIN DISCONNECT Q1; CONTROL XFMR T1 480:120V; PLC-03 24VDC POWER SUPPLY; SENSOR LOOP POWER 24VDC.",
+          "extraction_method": "human_transcription",
+          "claim_id": "f.electrical.supply",
+          "confidence": "high",
+          "assertion": "visual_transcription",
+          "claim": "AEG-DWG-E02 — visible_power_ratings: The drawing labels main disconnect Q1, Control Transformer T1 480:120V, and 24VDC control/sensor-loop components. It does not specify an incoming phase count."
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/reference/component_register.xlsx",
+          "locator": "Sheet Components, row 12, cells A12:F12",
+          "quote": "A12=Q1 | B12=Main Disconnect | C12=— | D12=Control Cabinet 1 | E12=Active | F12=480V [incoming] disconnect.",
+          "extraction_method": "indexed_source_excerpt"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/reference/component_register.xlsx",
+          "locator": "Sheet Components, row 13, cells A13:F13",
+          "quote": "A13=T1 | B13=Control [Transformer] | C13=— | D13=Control Cabinet 1 | E13=Active | F13=480:120V control power.",
+          "extraction_method": "indexed_source_excerpt"
+        }
+      ],
+      "resolved_entities": [],
+      "unresolved": [
+        "No answer rule matched with enough specificity. The system abstained rather than generate an unsupported conclusion."
+      ],
+      "limitations": [
+        "Question routing is deterministic and may require different wording or a documented rule."
+      ]
+    }
+  },
+  {
+    "id": "D17",
+    "question": "Can the field note's roughly 175 bar reading be treated as the controlled normal setpoint?",
+    "expected": "No. It is an approximate reading from an uncalibrated gauge, with firmware unknown and no HMI cross-check. The note recommends checking with a calibrated gauge, so it is a low-trust observation rather than the controlled setpoint.",
+    "sources": "low_trust/site_survey_notes.docx paragraphs 3, 4, 7",
+    "actual": {
+      "status": "answered",
+      "route_id": "fallback_search",
+      "answer": "No, the approximately 175 bar reading in the field note should not be treated as the controlled normal setpoint; the documented normal discharge pressure setpoint for the applicable software revision (3.2) is 200 bar.",
+      "claims": [],
+      "evidence": [
+        {
+          "source": "aegis-dataset/aegis-dataset/low_trust/site_survey_notes.docx",
+          "locator": "paragraphs 3 and 7",
+          "quote": "gauge on the local panel ... about 175 bar during a normal run ... Could be the gauge is a little off, didn't have a calibrated reference ... didn't get a chance to check what software revision the controller is running.",
+          "extraction_method": "python-docx",
+          "claim_id": "f.field_observation.pressure",
+          "confidence": "low",
+          "assertion": "unverified_field_note",
+          "claim": "Line 4 HPU — field_observed_pressure: 175"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/manuals/operator_manual.pdf",
+          "locator": "p. 1, §4.3 and §5; p. 2",
+          "quote": "This is the normal operating pressure for software revision 3.2 and later.",
+          "extraction_method": "pypdf",
+          "claim_id": "f.pressure.current",
+          "confidence": "high",
+          "assertion": "direct",
+          "claim": "HPU — normal_discharge_pressure: 200"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/reference/revision_history.xlsx",
+          "locator": "Revision History!A4:D4",
+          "quote": "3.2 | 2025-09-30 | Pressure sensor PS-04 replaced by PS-04A. Normal HPU discharge pressure setpoint changed from 180 bar to 200 bar. See ECN-1042.",
+          "extraction_method": "openpyxl",
+          "claim_id": "f.revision.3_2_date",
+          "confidence": "high",
+          "assertion": "direct",
+          "claim": "firmware 3.2 — release_date: 2025-09-30"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/configuration/configuration_export.json",
+          "locator": "$.sensors.sensor_ps04a_threshold_bar and $.revision_applicability.sensor_ps04a_threshold_bar",
+          "quote": "sensor_ps04a_threshold_bar = 200; applies_from_firmware = \"3.2\"",
+          "extraction_method": "json",
+          "claim_id": "f.configuration.pressure_key",
+          "confidence": "high",
+          "assertion": "derived_from_schema_and_manual",
+          "claim": "sensor_ps04a_threshold_bar — maps_to: The normal HPU discharge pressure setpoint/target for PS-04A, 200 bar on software revision 3.2 and later; it is not the A17 low-pressure alarm threshold."
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/engineering_bulletins/ECN-1042.pdf",
+          "locator": "Page 1",
+          "quote": " … Alongside the sensor change, the [normal] HPU discharge pressure [setpoint] is revised from 180 [bar] to 200 [bar]. This is a deliberate process change, not a sensor calibration artifact: the higher [setpoint] improves press cycle time … ",
+          "extraction_method": "indexed_source_excerpt"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/scans/scanned_appendix_calibration.pdf",
+          "locator": "Page 1; Calibration record and results",
+          "quote": " … Zero (0%), reference 0 [bar], [reading] 0.1 [bar], PASS; Mid (50%), reference 100 [bar], [reading] 99.6 [bar], PASS; Span (100%), reference 200 [bar], [reading] 199.4 [bar], PASS. This calibration record supersedes the [field] … ",
+          "extraction_method": "indexed_source_excerpt"
+        }
+      ],
+      "resolved_entities": [],
+      "unresolved": [
+        "No answer rule matched with enough specificity. The system abstained rather than generate an unsupported conclusion."
+      ],
+      "limitations": [
+        "Question routing is deterministic and may require different wording or a documented rule."
+      ]
+    }
+  },
+  {
+    "id": "D18",
+    "question": "What does the supplied revision history say about software 3.3, and does the package show a released change?",
+    "expected": "The revision history lists 3.3 as planned for 2026-04-07 for extended diagnostics logging, with no sensor or setpoint change planned, and says it is not yet published. The supplied package does not establish that it was later released.",
+    "sources": "reference/revision_history.xlsx Revision History row 6",
+    "actual": {
+      "status": "answered",
+      "route_id": "fallback_search",
+      "answer": "The revision history entry for software version 3.3 indicates it is scheduled for 2026‑04‑07, with the change described as “extended diagnostics logging” and notes that it is not yet published. No released change for version 3.3 appears in the supplied package.",
+      "claims": [],
+      "evidence": [
+        {
+          "source": "aegis-dataset/aegis-dataset/reference/revision_history.xlsx",
+          "locator": "Sheet Revision History, row 6, cells A6:D6",
+          "quote": "A6=[3.3] | B6=2026-04-07 (planned) | C6=Scheduled: extended diagnostics logging. No sensor or setpoint changes currently planned. | D6=Not yet published",
+          "extraction_method": "indexed_source_excerpt"
+        }
+      ],
+      "resolved_entities": [],
+      "unresolved": [
+        "No answer rule matched with enough specificity. The system abstained rather than generate an unsupported conclusion."
+      ],
+      "limitations": [
+        "Question routing is deterministic and may require different wording or a documented rule."
+      ]
+    }
+  },
+  {
+    "id": "D19",
+    "question": "Which alternate names in the documentation refer to the HPU assembly?",
+    "expected": "The documentation also calls it the Hydraulic Unit, HP unit, Hydraulic Power Pack, hydraulic pack, or simply the unit.",
+    "sources": "manuals/operator_manual.pdf p.1 §1; reference/component_register.xlsx Components row 2; training/maintenance_training_slides.pptx slide 2",
+    "actual": {
+      "status": "answered",
+      "route_id": "fallback_search",
+      "answer": "Hydraulic Unit, HP unit, Hydraulic Power Pack, Hydraulic Power Unit",
+      "claims": [],
+      "evidence": [
+        {
+          "source": "aegis-dataset/aegis-dataset/manuals/operator_manual.pdf",
+          "locator": "p. 1, §1",
+          "quote": "the Hydraulic Power Unit may also be referred to as the Hydraulic Unit or the HP unit ... All three terms refer to the same physical assembly.",
+          "extraction_method": "pypdf",
+          "claim_id": "f.hpu.aliases",
+          "confidence": "high",
+          "assertion": "direct",
+          "claim": "HPU — has_alias: ['Hydraulic Unit', 'HP unit', 'Hydraulic Power Pack', 'Hydraulic Power Unit']"
+        },
+        {
+          "source": "aegis-dataset/aegis-dataset/manuals/operator_manual.pdf",
+          "locator": "Page 1",
+          "quote": " … All three terms [refer] to the same physical [assembly]. 2. Key Components Reference Component Function [HPU] Hydraulic Power Unit Generates and regulates hydraulic pressure IV-21 Isolation Valve 21 Isolates the [HPU] from the press circuit … ",
+          "extraction_method": "indexed_source_excerpt"
+        }
+      ],
+      "resolved_entities": [
+        {
+          "canonical_id": "HPU",
+          "type": "assembly",
+          "matched_alias": "HPU",
+          "matched_text": "HPU"
+        }
+      ],
+      "unresolved": [
+        "No answer rule matched with enough specificity. The system abstained rather than generate an unsupported conclusion."
+      ],
+      "limitations": [
+        "Question routing is deterministic and may require different wording or a documented rule."
+      ]
+    }
+  },
+  {
+    "id": "D20",
+    "question": "In the wiring diagram, what devices are associated with TB-7's J-14 and J-15 branches?",
+    "expected": "TB-7 branch J-14 goes to the pressure transducer (identified as HPU discharge PS-04A); J-15 goes to the IV-21 solenoid.",
+    "sources": "diagrams/wiring_diagram.pdf p.1 diagram and note; reference/component_register.xlsx Components rows 5 and 11",
+    "actual": {
+      "status": "answered",
+      "route_id": "fallback_search",
+      "answer": "J-14 branch connects the HPU discharge pressure transducer (PS‑04A) and J-15 branch connects the IV‑21 solenoid valve.",
+      "claims": [],
+      "evidence": [
+        {
+          "source": "aegis-dataset/aegis-dataset/diagrams/wiring_diagram.pdf",
+          "locator": "Page 1",
+          "quote": "Aegis Series-[7] HCS — Instrumentation [Wiring] [Diagram] (AEG-DWG-W03) Terminal block and connector references are local to this drawing. PLC-03 Terminal Block TB-[7] Connector Connector J-[14] J-[15] PRESSURE XDCR IV-21 … ",
+          "extraction_method": "indexed_source_excerpt"
+        }
+      ],
+      "resolved_entities": [
+        {
+          "canonical_id": "TB-7",
+          "type": "terminal_block",
+          "matched_alias": "TB-7",
+          "matched_text": "TB-7"
+        }
+      ],
+      "unresolved": [
+        "No answer rule matched with enough specificity. The system abstained rather than generate an unsupported conclusion."
+      ],
+      "limitations": [
+        "Question routing is deterministic and may require different wording or a documented rule."
+      ]
+    }
+  }
+]
