@@ -99,6 +99,7 @@ body{background:var(--paper);color:var(--ink)}.sidebar{background:#f5f3ef;border
 #followup,.main.source-open #followup,.app.sidebar-collapsed .main #followup{width:min(768px,100%);max-width:768px}
 @media(max-width:800px){.main{padding:18px 20px 0}.main.source-open{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto minmax(260px,55vh);padding:18px 20px 0;gap:0}.dock-resizer{display:none}.main.source-open .source-dock{grid-column:1;grid-row:3;height:100%;border-left:0;border-top:1px solid var(--line);padding:12px 0 0}.main.source-open #followup{grid-column:1;grid-row:2;margin:8px auto 12px}.source-dock{position:relative;top:auto}.sidebar-toggle{display:grid}}
 @media(max-width:600px){.app{display:block}.sidebar{position:fixed;z-index:6;left:0;top:0;bottom:0;width:270px;height:100vh;transform:translateX(-101%);transition:transform .2s;box-shadow:var(--shadow)}.sidebar.open{transform:translateX(0)}.sidebar-rail{position:fixed;z-index:4;left:0;top:0;bottom:0;width:52px;height:100vh}.sidebar-rail.hidden{display:flex!important}.app.sidebar-collapsed .workspace{margin-left:52px}.main,.main.source-open{height:100vh;min-height:0;padding:14px 14px 0}.main.source-open{grid-template-rows:minmax(0,1fr) auto minmax(230px,48vh)}.welcome{margin:12vh 0 0}.welcome h1{font-size:25px}.user-question{max-width:94%}.main.source-open .source-dock{height:100%}.viewer-frame{height:48vh;min-height:220px}}
+.retry-answer{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:6px 10px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink);font-size:12px}.retry-answer:hover:not(:disabled){background:var(--mint);border-color:#cddbcf}.retry-answer:disabled{opacity:.55;cursor:wait}
 </style></head><body>
 <div class="app">
 <aside class="sidebar" id="sidebar"><div class="sidebar-head"><div class="brand"><div class="brand-mark">A</div><div><div class="brand-name">Aegis</div><div class="brand-caption">Evidence workspace</div></div></div><button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Hide question history" title="Hide question history"><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="m16 15-3-3 3-3"/></svg></button></div>
@@ -140,8 +141,8 @@ function appendAnswer(parent,item){
  const layout=el('div','answer-layout'),column=el('div','answer-column'),card=el('article','answer-card'),head=el('div','answer-head');
  head.append(el('span','answer-label','Answer'),el('span','status '+item.data.status,item.data.status==='answered'?'Supported by sources':'Not established'));
  card.append(head,el('p','answer-text',item.data.answer));
+ const section=el('section','section');section.append(el('h2','section-title','Sources'));
  if(item.data.evidence?.length){
-  const section=el('section','section');section.append(el('h2','section-title','Sources'));
   const list=el('div','source-list');
   item.data.evidence.forEach(evidence=>{
    const label=evidence.source.split('/').pop()+' · '+evidence.locator,link=el('button','source-link',label);
@@ -149,12 +150,27 @@ function appendAnswer(parent,item){
    link.addEventListener('click',()=>openSource(evidence));
    list.append(link);
   });
-  section.append(list);column.append(card,section);layout.append(column);
- }else{column.append(card);layout.append(column)}
+  section.append(list);
+ }else{section.append(el('p','viewer-meta','No matching source passages were found.'))}
+ const retry=el('button','retry-answer',item.retrying?'Retrying…':'Retry answer');
+ retry.type='button';retry.disabled=Boolean(item.retrying);retry.setAttribute('aria-label','Retry this question');
+ retry.addEventListener('click',()=>retryAnswer(item));
+ section.append(retry);column.append(card,section);layout.append(column);
  parent.append(layout);
 }
+async function retryAnswer(item){
+ if(item.retrying)return;
+ const owner=threads.find(thread=>thread.items.includes(item));if(!owner)return;
+ item.retrying=true;if(activeId===owner.id)showThread(owner.id);
+ try{
+  const response=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:item.question})});
+  const data=await response.json();if(!response.ok)throw new Error(data.error||'Request failed');
+  item.data=data;save();
+ }catch(error){item.data={status:'insufficient_evidence',answer:'The local service could not complete this retry. '+error.message,claims:[],evidence:[]};save()}
+ finally{item.retrying=false;if(activeId===owner.id)showThread(owner.id)}
+}
 function showThread(id){const thread=threads.find(t=>t.id===id);if(!thread)return;activeId=id;welcome.classList.add('hidden');conversation.classList.remove('hidden');followup.classList.remove('hidden');conversation.replaceChildren();for(const item of thread.items){conversation.append(el('div','user-question',item.question));appendAnswer(conversation,item)}renderHistory();sidebar.classList.remove('open');conversationPane.scrollTo({top:conversationPane.scrollHeight,behavior:'smooth'})}
-async function ask(question,button,targetForm){button.disabled=true;targetForm.querySelector('textarea').disabled=true;let thread=threads.find(t=>t.id===activeId);if(!thread){thread={id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),title:question.slice(0,62),items:[]};threads.unshift(thread);activeId=thread.id}const pending={question,data:{status:'answered',answer:'Searching the supplied documents…',claims:[],evidence:[]}};thread.items.push(pending);welcome.classList.add('hidden');conversation.classList.remove('hidden');followup.classList.remove('hidden');conversation.setAttribute('aria-busy','true');renderHistory();showThread(thread.id);conversation.setAttribute('aria-busy','true');try{const response=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question})});const data=await response.json();if(!response.ok)throw new Error(data.error||'Request failed');pending.data=data;save();showThread(thread.id)}catch(error){pending.data={status:'insufficient_evidence',answer:'The local service could not complete this request. '+error.message,claims:[],evidence:[]};save();showThread(thread.id)}finally{button.disabled=false;targetForm.querySelector('textarea').disabled=false;conversation.setAttribute('aria-busy','false');targetForm.querySelector('textarea').value='';targetForm.querySelector('textarea').focus()}}
+async function ask(question,button,targetForm){button.disabled=true;targetForm.querySelector('textarea').disabled=true;let thread=threads.find(t=>t.id===activeId);if(!thread){thread={id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),title:question.slice(0,62),items:[]};threads.unshift(thread);activeId=thread.id}const pending={question,retrying:true,data:{status:'answered',answer:'Searching the supplied documents…',claims:[],evidence:[]}};thread.items.push(pending);welcome.classList.add('hidden');conversation.classList.remove('hidden');followup.classList.remove('hidden');conversation.setAttribute('aria-busy','true');renderHistory();showThread(thread.id);conversation.setAttribute('aria-busy','true');try{const response=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question})});const data=await response.json();if(!response.ok)throw new Error(data.error||'Request failed');pending.data=data;save();showThread(thread.id)}catch(error){pending.data={status:'insufficient_evidence',answer:'The local service could not complete this request. '+error.message,claims:[],evidence:[]};save();showThread(thread.id)}finally{pending.retrying=false;if(activeId===thread.id)showThread(thread.id);button.disabled=false;targetForm.querySelector('textarea').disabled=false;conversation.setAttribute('aria-busy','false');targetForm.querySelector('textarea').value='';targetForm.querySelector('textarea').focus()}}
 form.addEventListener('submit',event=>{event.preventDefault();const question=input.value.trim();if(question)ask(question,form.querySelector('button'),form)});followup.addEventListener('submit',event=>{event.preventDefault();const question=followupInput.value.trim();if(question)ask(question,followup.querySelector('button'),followup)});
 function setSidebarCollapsed(collapsed){if(window.matchMedia('(max-width:600px)').matches){if(collapsed)sidebar.classList.remove('open');else sidebar.classList.add('open');return}app.classList.toggle('sidebar-collapsed',collapsed);sidebarRail.classList.toggle('hidden',!collapsed);sidebar.style.display=collapsed?'none':'';app.style.gridTemplateColumns=collapsed?'52px minmax(0,1fr)':''}
 function setDockWidth(width){const maxWidth=Math.max(360,Math.min(window.innerWidth*.68,main.clientWidth-420));width=Math.max(360,Math.min(maxWidth,width));main.style.setProperty('--dock-width',width+'px');dockResizer.setAttribute('aria-valuemax',String(Math.round(maxWidth)));dockResizer.setAttribute('aria-valuenow',String(Math.round(width)))}

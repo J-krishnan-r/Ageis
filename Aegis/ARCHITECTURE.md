@@ -2,9 +2,11 @@
 
 ## Objective and design choices
 
-The application turns the supplied heterogeneous Aegis package into indexed, source-located evidence and a small graph-shaped set of typed claims. A question reaches a deterministic answer rule; the rule names the claims, and each claim supplies its own evidence. A separate SQLite full-text index finds passages for questions without a matching rule. That fallback shows the passages as search context and abstains, because an excerpt by itself is not a validated answer.
+The application turns the supplied heterogeneous Aegis package into indexed, source-located evidence and a small graph-shaped set of typed claims. It uses a hybrid question-answering path: deterministic rules handle recognized intents and known, scoped facts; source retrieval plus a language model handles questions that do not match a rule. The model receives the question and selected evidence, and must return source IDs for its answer. If the model is unavailable, or cannot return a valid grounded response, the application falls back to the rule answer or an explicit evidence-based abstention.
 
-The assessment does not require a model, a graph database, or a particular web framework. This implementation uses Python parsers, JSON as the editable knowledge representation, SQLite FTS5 for small-corpus retrieval, and the Python standard-library HTTP server for the browser interface. It has no model at runtime. For this fictional package, deterministic document parsing plus human-reviewed visual transcription produces reproducible evidence and avoids presenting OCR guesses or generated summaries as verified facts. The explicit rule pipeline is easy to inspect and discuss in a live review.
+The implementation uses Python parsers, JSON as the editable knowledge representation, SQLite FTS5 for small-corpus lexical retrieval, LiteLLM as the model interface, and the Python standard-library HTTP server for the browser interface. At runtime the model is Groq's `openai/gpt-oss-120b` endpoint, selected through LiteLLM. `GROQ_API_KEY` is read from the environment (a local `.env` file is supported); it must not be committed or written into documentation. Model availability is optional for deterministic rules, but unmatched questions need it for natural-language synthesis. Deterministic document parsing plus human-reviewed visual transcription keeps the evidence layer reproducible and avoids treating OCR guesses or generated summaries as verified source facts. The explicit rules remain inspectable and useful for exact, revision-scoped requirements.
+
+The design tradeoffs and the fuller hybrid RAG approach the author would prefer are described in [`AUTHORS_NOTE.md`](AUTHORS_NOTE.md).
 
 ```mermaid
 flowchart LR
@@ -12,11 +14,19 @@ flowchart LR
   V[Reviewed visual transcriptions with image regions] --> B
   B --> C[SQLite evidence segments and FTS index]
   D[Entities, aliases, scoped facts, provenance] --> E[Deterministic question rules]
-  C --> F[Evidence search fallback]
-  E --> G[Claim and evidence response]
-  F --> H[Abstention with retrieved excerpts]
-  G --> I[CLI and local web interface]
+  Q[User question] --> E
+  Q --> F[Lexical evidence retrieval and ranking]
+  C --> F
+  E --> G[Rule answer with cited claims]
+  E -. no sufficiently specific rule .-> F
+  D --> H[Ranked curated facts]
+  F --> I[Evidence-grounded LiteLLM answer]
   H --> I
+  I --> J[Validated answer and cited evidence]
+  I --> K[Abstention if evidence or model response is insufficient]
+  G --> L[CLI and local web interface]
+  J --> L
+  K --> L
 ```
 
 ## Intermediate representation
@@ -64,15 +74,21 @@ The training excerpt is an additional source with narrower scope. It describes a
 
 ## Query and user interface
 
-`aegis/knowledge/answer_rules.json` declares deterministic intent terms and the exact fact IDs used by each response. All term groups in a rule must be present. The most specific unique rule wins. A tie or a question with insufficient specificity falls through to full-text retrieval and an abstention. The rules state their answer text and cite claims independently, making answer behavior reviewable without inspecting application code.
+`aegis/knowledge/answer_rules.json` declares deterministic intent terms and the exact fact IDs used by each response. All term groups in a rule must be present. The most specific unique rule wins. Ambiguous ties and unmatched questions go to the retrieval path. `_search()` removes common stop words, queries SQLite FTS5, considers up to 30 lexical candidates, and reranks them by query-term coverage and exact version matches. The returned set is capped at eight passages; each passage includes a short display quote and a bounded segment context for the model. `_rank_fact_evidence()` independently ranks up to four relevant curated facts with their provenance. Candidate evidence is de-duplicated and capped before it is sent to the model.
 
-Every matched answer includes status, route, answer text, typed claims, resolved identifiers, supporting excerpts, exact source locators, extraction methods, claim confidence, unresolved points, and package-scope limits. A `null` value cannot produce an answered status. The browser displays those fields and the CLI can print the same structure with `--json`. The HTTP API is `POST /api/ask`; `GET /health` provides local index status. Requests have a size limit. The server binds only to loopback and sends restrictive security headers. No user text is interpolated as HTML.
+For an unmatched question, `_grounded_fallback_answer()` calls LiteLLM with the question and selected facts/passages. The prompt asks for a concise answer, an `answered` or `insufficient_evidence` status, and IDs of supporting evidence. Only IDs from the supplied set are accepted; an answered response without valid citations is rejected. Returned citations point back to source paths, locators, and short excerpts. If configuration, network, model output, or citation validation fails, the normal fallback remains an explicit abstention with the retrieved passages. This is evidence-grounded generation, not a guarantee that a model will reason correctly over every relevant passage.
+
+For a matched deterministic rule, the system builds its answer and claims from the catalog first. If the model key is configured, `_generate_human_answer()` may rephrase that supported answer using the rule's claims, evidence, and unresolved points; it is instructed not to add facts or turn an abstention into an answer. If the call fails, the deterministic rule wording is returned. Rules therefore remain useful for exact, revision-scoped questions, while the model helps express rule answers naturally and answer novel phrasings from retrieved evidence.
+
+Rule-backed answers include status, route, answer text, typed claims, resolved identifiers, supporting excerpts, exact source locators, extraction methods, claim confidence, unresolved points, and package-scope limits. Retrieval-backed answers return only the source excerpts cited by the model; a failed or unsupported synthesis retains the abstention status. A `null` value cannot produce an answered status. The browser displays the answer and sources, and the CLI can print the response structure with `--json`. The HTTP API is `POST /api/ask`; `GET /health` provides local index status. Requests have a size limit. The server binds only to loopback and sends restrictive security headers. No user text is interpolated as HTML. Each conversation answer has a retry button that resubmits the original question to `/api/ask`; it is a fresh request through the same route and retrieval strategy, not a separate recovery algorithm.
 
 ## Evaluation approach
 
 The original assessment supplies 23 questions but no official answers or metric definitions. `aegis/benchmarks/questions.json` provides a curated expected route, answerability label, and required fact IDs for each prompt. Eighteen questions have direct support in the supplied corpus. Five request facts the sources do not establish, or assume a voltage sensor that the drawing does not identify. The expected behavior for those five is abstention with source-bounded context.
 
 The evaluator counts a case as exactly correct only if its route and answerability state match the curated key, every expected fact appears, each expected citation's source and locator match, the cited file exists, and the supporting excerpt is emitted. It separately reports accuracy for the answerable and abstention groups, expected-fact recall, citation completeness, and full-corpus extraction counts. This evaluates the known challenge questions and the authored answer key; it is not a general QA test, an unseen-data score, or a benchmark of probabilistic confidence.
+
+An additional independent 20-question dataset assessment is recorded in `reports/INDEPENDENT_DATASET_20Q_ASSESSMENT.md`. It exercises deterministic routes and the configured model fallback using questions and expected answers derived from the dataset. Its latest recorded run had 15 fully correct answers, three partial answers, one abstention where supporting evidence existed, and one answer with an unsupported firmware assumption. This is a small diagnostic sample, not a general performance guarantee. It demonstrates that retrieving relevant evidence does not ensure the model will use it completely or avoid unsupported assumptions.
 
 ## Loss and confidence analysis
 
@@ -84,4 +100,4 @@ Confidence labels distinguish direct controlled or source-backed evidence (`high
 
 ## Operational limits
 
-The actual provided operator and maintenance manuals contain two and one pages, despite the task brief listing 12 and 18. Indexing reports reflect the actual files. The one-page maintenance manual omits referenced procedures and maintenance schedules; the system cannot reconstruct them. The rules are narrow and deterministic. New question phrasing may fall back to search until an answer rule and its evidence are reviewed. The loopback UI has no external authentication and is intended for local access; shared-network use requires an authenticated deployment layer.
+The actual provided operator and maintenance manuals contain two and one pages, despite the task brief listing 12 and 18. Indexing reports reflect the actual files. The one-page maintenance manual omits referenced procedures and maintenance schedules; the system cannot reconstruct them. Rules are narrow and deterministic; novel wording relies on lexical retrieval and model synthesis, so weak retrieval or incomplete context can still cause omissions or abstentions. The retry button resubmits the same question and may produce the same result. The model adds external-service availability, latency, quota, cost, privacy, and context-window constraints. The loopback UI has no external authentication and is intended for local access; shared-network use requires an authenticated deployment layer.
